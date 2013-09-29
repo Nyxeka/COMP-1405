@@ -17,8 +17,8 @@ import os
 
 # end imports #######################
 
-global direction = ["north", "south", "east", "west"] #we reference to this...
-        
+direction = ["north", "south", "east", "west"] #we reference to this...
+
 class portal:
     #portals between rooms:
     portal_index = None
@@ -35,9 +35,9 @@ class room:
     
     portal_index = []
     
-    def __init__(self, portal_index_list):
-        self.room_num = index_num
-       self.portal_index = portal_index_list
+    def __init__(self, room_num, portal_index_list):
+        self.room_num = room_num
+        self.portal_index = portal_index_list
        
     def clear_room_info(self):
         self.room_info = []
@@ -52,7 +52,6 @@ class level:
     current_room = 0
     current_life = 100
     
-    
     def __init__(self, endRoomNum):
         self.end_room_index = endRoomNum
     
@@ -60,26 +59,40 @@ class level:
         self.rooms += [room(room_num, portal_list )]
     
     def add_portal(self, portal_num, portal_type, connected_rooms):
-        portals += [portal(portal_num,portal_type,connected_rooms)]
+        self.portals += [portal(portal_num,portal_type,connected_rooms)]
     
-    def room_intro(self,cur_room):
-        print "You look around."
+    def set_end_room_index(self, end_room_index):
+        self.end_room_index = end_room_index
+    
+    def room_intro(self, cur_room):
+        print "------------------------------------------------------------------------"
+        print "You look around.\n"
         for i in range(4):
-            if self.portals[cur_room.portal_index[i]].barrier_type == None:
-                print "to the " + direction[i] + " is a wall"
+            if cur_room.portal_index[i] == None:
+                print "To the " + direction[i] + " is a wall"
             elif self.portals[cur_room.portal_index[i]].barrier_type == 0:
-                print "to the " + direction[i] + " there is a barrier."
+                print "To the " + direction[i] + " there is a barrier."
             elif self.portals[cur_room.portal_index[i]].barrier_type == 1:
-                print "to the " + direction[i] + " there is a barrier with a desktop computer in front of it, on a desk."
-                print "the computer screen has some text on it that says 'if you go in this direction, you must play my game.'"
+                print "To the " + direction[i] + " there is a barrier with a desktop computer in front of it, on a desk."
+                print "The computer screen has some text on it that says 'if you go in this direction, you must play my game.'"
             elif self.portals[cur_room.portal_index[i]].barrier_type == 2:
-                print "to the " + direction[i] + " there is a one-way barrier."
+                print "To the " + direction[i] + " there is a one-way barrier."
             elif self.portals[cur_room.portal_index[i]].barrier_type == 3:
-                print "to the " + direction[i] + " IS THE END."
-        print "you may go in the direction(s):"
+                print "To the " + direction[i] + " IS THE END."
+        print "\nYou may go in the direction(s):"
         for i in range(4):
             if cur_room.portal_index[i] is not None:
                 print direction[i]
+    
+    def change_rooms(self, new_room):
+        #I know this is bad coding but I'll put the following where it's supposed to be later...
+        print ("------------------------------------------------------------------------\n"
+               "You step towards the barrier and it begins to fade to black faster. as you pass through, "
+               "it shatters like glass, the individual pieces fading to nothingness before they hit the "
+               "ground. You feel the drain on your life force")
+        self.current_room = new_room
+        next = raw_input("Press Enter to continue")
+        self.room_intro(self.rooms[self.current_room])
 #done with object stuff...
 
 def create_level():
@@ -105,7 +118,8 @@ def create_level():
     newLev.add_room(16,[18,None,None,19])
     newLev.add_room(17,[None,None,None,None])
     #now add the portals:
-    #add_portal(self, portal_num, portal_type: 0,1,2, connected_rooms: must be in order if one-way)
+    #add_portal(self, portal_num, portal_type: 0,1,2,3 connected_rooms: must be in order if one-way)
+    newLev.add_portal(0, 2, [100,100])
     newLev.add_portal(1, 2, [0,1])
     newLev.add_portal(2, 0, [1,2])
     newLev.add_portal(3, 0, [2,3])
@@ -127,27 +141,13 @@ def create_level():
     newLev.add_portal(19, 0, [16,15])
     newLev.add_portal(20, 0, [14,17])
     
+    newLev.set_end_room_index(17)
+    
     return newLev
     
-    
-def main():
-    # main function
-    
-    
-    
 
+def playGame(difficulty, newLev):
+    print "play game"
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+def showIntroMenu():
+    print "intro menu c:"
