@@ -52,6 +52,7 @@ class level:
     rooms = []
     portals = []
     end_room_index = 0
+    difficulty = 5
     
     #player stuff:
     current_room = 0
@@ -59,6 +60,7 @@ class level:
     
     def __init__(self, endRoomNum):
         self.end_room_index = endRoomNum
+        #self.difficulty = difficulty
     
     def add_room(self,room_num, portal_list):
         self.rooms += [room(room_num, portal_list )]
@@ -68,6 +70,9 @@ class level:
     
     def set_end_room_index(self, end_room_index):
         self.end_room_index = end_room_index
+        
+    def drain_life(self, amount):
+        self.current_life = current_life - amount
     
     def room_intro(self, cur_room):
         print "------------------------------------------------------------------------"
@@ -103,6 +108,10 @@ class level:
         self.current_room = new_room_index
         next = raw_input("Press Enter to continue")
         self.room_intro(self.rooms[self.current_room])
+    #dir is short of direction - direction is already a used global variable.
+        
+    
+    #REMEMBER TO PUT A METHOD IN HERE TO 
 #done with object stuff...
 
 def create_level():
@@ -110,7 +119,7 @@ def create_level():
     
     #first add the rooms
     newLev.add_room(0,[1, None, None, None])
-    newLev.add_room(1,[None,1,2,None])
+    newLev.add_room(1,[None,None,2,None])
     newLev.add_room(2,[3,9,8,2])
     newLev.add_room(3,[None,3,4,None])
     newLev.add_room(4,[None,None,5,4])
@@ -168,14 +177,31 @@ def playGame(difficulty, newLev):
         command_entered = False
         try:
             com = raw_input("Please enter a command: ")
-            if any(x in command_list[i] for x in com.upper()):
-                com_entered = True
-        except EOFError: #incase the user typed in ctrl+z or something...
-            print "EOF error in your input. wtf are you typing?"
+            if com.upper() in command_list:
+                command_entered = True
+        except ValueError: #incase the user typed in ctrl+z or something...
+            print "ValueError: please type a string >_>"
     #now we want to check the command, and do stuff about it!
     #yay I get to use my super awesome portal system!
-    if command_entered = True:
-        
+        if command_entered == True:
+            com = com.upper()
+            if command_list.index(com) < 4:
+                #direction.index(com)
+                if newLev.rooms[newLev.current_room].portal_index[direction.index(com.lower())] is not None:
+                    #for now, we will assume no game barriers are present.
+                    new_portal_index = newLev.rooms[newLev.current_room].portal_index[direction.index(com.lower())]
+                    newRoom = (newLev.portals[new_portal_index].connected_rooms.index(newLev.current_room)+1) % len(newLev.portals[new_portal_index].connected_rooms)
+                    print str(newLev.portals[new_portal_index].connected_rooms.index(newLev.current_room)+1)
+                    print str(newRoom)
+                    print str(newLev.portals[new_portal_index].connected_rooms)
+                    newLev.change_rooms(newLev.portals[new_portal_index].connected_rooms[newRoom])
+                else:
+                    print "\nYou may not go in that direction.\n"
+            if com == "HELP":
+                print "help stuff goes here. TO BE ADDED"
+            if com == "EXIT":
+                print "Exit called, quitting."
+                break
         
     
 
@@ -219,15 +245,12 @@ Please select your difficulty level (an integer between 0 and 10:
         except ValueError:
             print "Or whatever. defaulting to 5."
             newdif = 5
-        except EOFError:
-            print "Or whatever. defaulting to 5."
-            newdif = 5
-    except EOFError:
-        print "Or whatever. defaulting to 5."
-        newdif = 5
     newdif = newdif % 10
     
     return newdif
     
 def main():
     playGame(showIntroMenu(), create_level())
+
+if __name__ == "__main__":
+    main()
