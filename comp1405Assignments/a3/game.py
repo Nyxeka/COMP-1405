@@ -13,14 +13,42 @@ Text-based dungeon crawler in python.
 
 # imports ###########################
 from __future__ import division
-import os
+import os, sys, time, random
 
 # end imports #######################
+
+map = """
+MAP:
+    03--04--05
+    ||  ||  ||
+01--02--07--06--11     00:          start room
+^^  ||          ||     17:          end room
+00  08--09--10>>12     <<,>>,^^,vv: one-way barrier
+            ||  ||     --,||:       normal barrier
+        17<<14  13
+            ||  ||
+            15--16
+"""
+
+help_message = """
+COMMANDS:
+_____________________
+DIRECTIONAL_COMMANDS:
+NORTH: move north
+SOUTH: move south
+EAST: move east
+WEST: move west
+_____________________
+OTHER_COMMANDS:
+HELP: display this help message
+MAP: display a map of the level
+EXIT: quit the game
+"""
 
 direction = ["north", "south", "east", "west"] #we reference to this...
 
 # come up with commands and put them here to compare with when we want the users input:
-command_list = ["NORTH", "SOUTH", "EAST", "WEST", "HELP", "EXIT", "YES", "NO", "Y", "N"]
+command_list = ["NORTH", "SOUTH", "EAST", "WEST", "HELP", "EXIT", "YES", "NO", "Y", "N", "MAP"]
 
 class portal:
     #portals between rooms:
@@ -83,6 +111,7 @@ class level:
     def room_intro(self, cur_room):
         print "\n"
         print "You look around...\n"
+        time.sleep(0.8)
         #check the surrounding walls for portals.
         #we want to tell the user where they are, and what type of portal it is...
         for i in range(4):
@@ -98,30 +127,67 @@ class level:
             elif self.portals[cur_room.portal_index[i]].barrier_type == 3:
                 print "To the " + direction[i] + " IS THE END."
             print "\n"
+            time.sleep(1.5)
         print "The number on the floor says: " + str(cur_room.room_num)
-        #clarify.
+        #clarify the user...
         print "\nYou may go in the direction(s):"
         for i in range(4):
             if cur_room.portal_index[i] is not None:
                 print direction[i]
+                time.sleep(0.7)
     def change_rooms(self, new_room_index):
         #I know this is bad coding but I'll put the following where it's supposed to be later...
-        print ("------------------------------------------------------------------------\n"
-               "You step towards the barrier and it begins to fade to black faster. as you pass through, "
-               "it shatters like glass, the individual pieces fading to nothingness before they hit the "
-               "ground. You feel the drain on your life force. You have " + str(self.current_life) + " life points left")
+        print "You have " + str(self.current_life) + " life points left"
+        time.sleep(1)
         self.drain_life(self.life_drain)
         self.current_room = new_room_index
         self.room_intro(self.rooms[self.current_room])
     #dir is short of direction - direction is already a used global variable.
-    def play_a_game(self, difficulty):
-        print "a game"
-        input = raw_input("Press Enter to beat the game...")
-        self.drain_life(-3)
+    def play_challenge(self, difficulty):
+        #lots to do here...
+        #GAMES:
+        #which game is layed is decided by the difficulty entered.
+        #from 0 to 6, we will go for simple double-digit addition questions(get 2/3 right)
+        #from 7 to 13: guess my number 2**difficulty
+        #from 14 to 20: addition/subtraction triple digit. (get 3/5 right)
         
-    
-    #REMEMBER TO PUT A METHOD IN HERE TO 
-#done with object stuff...
+        if (difficulty < 7):
+            print """
+This will be a simple two-digit number addition challenge.
+I will ask you three questions. get two out of three to pass without losing life-points
+Get three out of three correct to pass, gaining 3x life-points usually drained.
+get 1/3 right and lose the usual amount of lifepoints while passing a barrier
+get none right, and all of the surrounding barriers in your room will shatter.
+"""
+            go = raw_input("Press Enter to continue and start the challenge.")
+            numCorrect = 0
+            for i in range(3):
+                a = random.randrange(1,100)
+                b = random.randrange(1,100)
+                answer = str(a+b)
+                print "Question %d" % (i+1)
+                guess = raw_input(str(a) + " + " + str(b) + " = ")
+                if guess == answer:
+                    numCorrect += 1
+                    time.sleep(0.5)
+                    print "Correct!"
+                else:
+                    print "Incorrect! The correct answer was " + str(answer)
+            if numCorrect == 0:
+                print "Unfortunately, you answered all of the questions wrong."
+                time.sleep(1)
+                print "All of the barriers around you flash to black and shatter as you"
+                print "make your way to the next room"
+                for i in self.rooms[self.current_room]:
+                    if i is not None:
+                        self.drain_life(self.life_drain)
+            elif numCorrect == 2:
+                self.drain_life(-self.life_drain)
+            elif numCorrect == 3:
+                self.drain_life(-3 * self.life_drain)
+        
+            
+#done with class stuff...
 
 def create_level(difficulty):
     newLev = level(17,difficulty)
@@ -204,12 +270,20 @@ def playGame(newLev):
                     newRoom = (newLev.portals[new_portal_index].connected_rooms.index(newLev.current_room)+1) % len(newLev.portals[new_portal_index].connected_rooms)
                     #check to see if barrier requires a challenge:
                     if newLev.portals[new_portal_index].barrier_type == 1:
-                        newLev.play_a_game(newLev.current_room)
+                        newLev.play_challenge(newLev.current_room)
+                    else:
+                        print ("------------------------------------------------------------------------\n"
+                               "You step towards the barrier and it begins to fade to black faster. as you pass through, "
+                               "it shatters like glass, the individual pieces fading to nothingness before they hit the "
+                               "ground. You feel the drain on your life force. ")
+                        time.sleep(1)
                     newLev.change_rooms(newLev.portals[new_portal_index].connected_rooms[newRoom])
                 else:
                     print "\nYou may not go in that direction.\n"
             if com == "HELP":
-                print "help stuff goes here. TO BE ADDED"
+                print help_message
+            if com == "MAP":
+                print map
             if com == "EXIT":
                 print "Exit called, quitting."
                 break
@@ -217,6 +291,32 @@ def playGame(newLev):
     
 
 def showIntroMenu():
+    print "I"
+    time.sleep(0.4)
+    os.system("cls")
+    print "I want"
+    time.sleep(0.2)
+    os.system("cls")
+    print "I want to"
+    time.sleep(0.4)
+    os.system("cls")
+    print"I want to play"
+    time.sleep(0.1)
+    os.system("cls")
+    print "I want to play a"
+    time.sleep(0.4)
+    os.system("cls")
+    print "I want to play a game"
+    time.sleep(0.6)
+    os.system("cls")
+    print "I want to play a game."
+    time.sleep(0.8)
+    os.system("cls")
+    print "I want to play a game.."
+    time.sleep(1)
+    os.system("cls")
+    print "I want to play a game..."
+    time.sleep(2.5)
     print """
  _   _                _         
 | \ | |              | |        
