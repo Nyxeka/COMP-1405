@@ -19,11 +19,15 @@ import os
 
 direction = ["north", "south", "east", "west"] #we reference to this...
 
+# come up with commands and put them here to compare with when we want the users input:
+command_list = ["NORTH", "SOUTH", "EAST", "WEST", "HELP", "EXIT", "YES", "NO", "Y", "N"]
+
 class portal:
     #portals between rooms:
     portal_index = None
     barrier_type = 0
-    connected_rooms = []
+    connected_rooms = [] #for checking in order.
+                         #if a portal is one-way, only put the portal index in one
     
     def __init__(self, portal_index, barrier_type, room_list):
         self.portal_index = portal_index
@@ -33,6 +37,7 @@ class portal:
 class room:
     room_num = None
     
+    #portal_index is a NSEW list of the portals' indexes in the room.
     portal_index = []
     
     def __init__(self, room_num, portal_index_list):
@@ -67,6 +72,8 @@ class level:
     def room_intro(self, cur_room):
         print "------------------------------------------------------------------------"
         print "You look around.\n"
+        #check the surrounding walls for portals.
+        #we want to tell the user where they are, and what type of portal it is...
         for i in range(4):
             if cur_room.portal_index[i] == None:
                 print "To the " + direction[i] + " is a wall"
@@ -79,18 +86,21 @@ class level:
                 print "To the " + direction[i] + " there is a one-way barrier."
             elif self.portals[cur_room.portal_index[i]].barrier_type == 3:
                 print "To the " + direction[i] + " IS THE END."
+            print "\n"
+        print "The number on the floor says: " + str(cur_room.room_num)
+        #clarify.
         print "\nYou may go in the direction(s):"
         for i in range(4):
             if cur_room.portal_index[i] is not None:
                 print direction[i]
     
-    def change_rooms(self, new_room):
+    def change_rooms(self, new_room_index):
         #I know this is bad coding but I'll put the following where it's supposed to be later...
         print ("------------------------------------------------------------------------\n"
                "You step towards the barrier and it begins to fade to black faster. as you pass through, "
                "it shatters like glass, the individual pieces fading to nothingness before they hit the "
                "ground. You feel the drain on your life force")
-        self.current_room = new_room
+        self.current_room = new_room_index
         next = raw_input("Press Enter to continue")
         self.room_intro(self.rooms[self.current_room])
 #done with object stuff...
@@ -119,7 +129,7 @@ def create_level():
     newLev.add_room(17,[None,None,None,None])
     #now add the portals:
     #add_portal(self, portal_num, portal_type: 0,1,2,3 connected_rooms: must be in order if one-way)
-    newLev.add_portal(0, 2, [100,100])
+    newLev.add_portal(0, 2, [100,100]) #forgot to add 0 as I drew the level map. oh well.
     newLev.add_portal(1, 2, [0,1])
     newLev.add_portal(2, 0, [1,2])
     newLev.add_portal(3, 0, [2,3])
@@ -147,7 +157,77 @@ def create_level():
     
 
 def playGame(difficulty, newLev):
-    print "play game"
+    newLev.room_intro(newLev.rooms[newLev.current_room])
+    running = True #if we ever want to stop...
+    #a check we do in the loop. if false, it will skip through the loop and return to
+    #asking for the command
+    command_entered = False
+    #com short for command
+    com = ""
+    while running:
+        command_entered = False
+        try:
+            com = raw_input("Please enter a command: ")
+            if any(x in command_list[i] for x in com.upper()):
+                com_entered = True
+        except EOFError: #incase the user typed in ctrl+z or something...
+            print "EOF error in your input. wtf are you typing?"
+    #now we want to check the command, and do stuff about it!
+    #yay I get to use my super awesome portal system!
+    if command_entered = True:
+        
+        
+    
 
 def showIntroMenu():
-    print "intro menu c:"
+    print """Welcome, and thank you for playing Nyxeka's Game!
+
+This is a bit of a maze-exploring game. Your character is stuck
+inside of a room, in a level created as some sort of test by 
+some sort of overpowering diety for the fun of it.
+
+The goal of the game is to get to the end without losing all of
+your life-points. You will start with 100 life-points, in a room.
+
+A room has four sides. each side either has a barrier or a wall.
+A barrier is similar to a holographic pane of glass. as you wait
+in the room, it fades to black and shatters. This will happen 
+every 30 seconds. every time a barrier shatters, you will lose
+one life-point. In order to pass some barriers, you must beat a 
+challenge/game. Every time you pass through a barrier, it will
+shatter. Every time you lose a game, all of the barriers in the 
+room will shatter.
+Every time a barrier shatters, it will zap back into exsistence
+once there is nothing blocking the way.
+
+To get to the end of the level, you must traverse between rooms
+until you find the end room. To move between rooms, simply enter
+the commands: "North", "South", "East", or "West". commands are 
+not case sensitive.
+
+Please select your difficulty level (an integer between 0 and 10:
+ 
+ """
+    difficulty = raw_input("Difficulty ranges from 0(easiest) to 10(hardest): ")
+    try: 
+        newdif = int(difficulty)
+    except ValueError:
+        print "please enter a number between 0 and 10 >_>"
+        difficulty = raw_input("Difficulty ranges from 0(easiest) to 10(hardest): ")
+        try: 
+            newdif = int(difficulty)
+        except ValueError:
+            print "Or whatever. defaulting to 5."
+            newdif = 5
+        except EOFError:
+            print "Or whatever. defaulting to 5."
+            newdif = 5
+    except EOFError:
+        print "Or whatever. defaulting to 5."
+        newdif = 5
+    newdif = newdif % 10
+    
+    return newdif
+    
+def main():
+    playGame(showIntroMenu(), create_level())
