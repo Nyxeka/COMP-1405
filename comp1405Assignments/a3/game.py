@@ -19,17 +19,6 @@ import ConfigParser
 # end imports #######################
 
 global direction = ["north", "south", "east", "west"] #we reference to this...
-
-class player:
-    lives_left = 10 #defaults to ten...
-
-class world:
-    lives_left = 10
-    levels = []
-    
-    def add_level(self,level_to_add):
-        self.levels += level
-
         
 class portal:
     #portals between rooms:
@@ -59,6 +48,7 @@ class level:
     rooms = []
     portals = []
     end_room_index = 0
+    current_room = 0
     
     def __init__(self, endRoomNum):
         self.end_room_index = endRoomNum
@@ -69,20 +59,23 @@ class level:
     def add_portal(self, portal_num, portal_type, connected_rooms):
         portals += [portal(portal_num,portal_type,connected_rooms)]
     
-    def room_intro(self,room_num):
+    def room_intro(self,cur_room):
         print "You look around."
         for i in range(4):
-            if self.portal_index[i] == None:
+            if self.portals[cur_room.portal_index[i]].barrier_type == None:
                 print "to the " + direction[i] + " is a wall"
-            elif self.portal_index[i] == 0:
+            elif self.portals[cur_room.portal_index[i]].barrier_type == 0:
                 print "to the " + direction[i] + " there is a barrier."
-            elif self.portal_index[i] == 1:
+            elif self.portals[cur_room.portal_index[i]].barrier_type == 1:
                 print "to the " + direction[i] + " there is a barrier with a desktop computer in front of it, on a desk."
                 print "the computer screen has some text on it that says 'if you go in this direction, you must play my game.'"
-            
+            elif self.portals[cur_room.portal_index[i]].barrier_type == 2:
+                print "to the " + direction[i] + " there is a one-way barrier."
+            elif self.portals[cur_room.portal_index[i]].barrier_type == 3:
+                print "to the " + direction[i] + " IS THE END."
         print "you may go in the direction(s):"
         for i in range(4):
-            if portal_index[i] is not None:
+            if cur_room.portal_index[i] is not None:
                 print direction[i]
 #done with object stuff...
 
@@ -109,7 +102,33 @@ def create_level():
     newLev.add_room(16,[18,None,None,19])
     newLev.add_room(17,[None,None,None,None])
     #now add the portals:
-
+    #add_portal(self, portal_num, portal_type: 0,1,2, connected_rooms: must be in order if one-way)
+    newLev.add_portal(1, 2, [0,1])
+    newLev.add_portal(2, 0, [1,2])
+    newLev.add_portal(3, 0, [2,3])
+    newLev.add_portal(4, 0, [3,4])
+    newLev.add_portal(5, 0, [4,5])
+    newLev.add_portal(6, 0, [5,6])
+    newLev.add_portal(7, 1, [7,6])
+    newLev.add_portal(8, 1, [2,7])
+    newLev.add_portal(9, 0, [2,8])
+    newLev.add_portal(10, 0, [8,9])
+    newLev.add_portal(11, 0, [9,10])
+    newLev.add_portal(12, 0, [10,12])
+    newLev.add_portal(13, 0, [6,11])
+    newLev.add_portal(14, 0, [11,12])
+    newLev.add_portal(15, 0, [12,13])
+    newLev.add_portal(16, 0, [10,14])
+    newLev.add_portal(17, 0, [15,14])
+    newLev.add_portal(18, 0, [13,16])
+    newLev.add_portal(19, 0, [16,15])
+    newLev.add_portal(20, 0, [14,17])
+    
+    
+    
+    return newLev
+    
+    
 def main():
     # main function
     
