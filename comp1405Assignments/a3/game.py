@@ -12,7 +12,7 @@ Text-based dungeon crawler in python.
 """
 
 # imports ###########################
-
+from __future__ import division
 import os
 
 # end imports #######################
@@ -58,8 +58,14 @@ class level:
     current_room = 0
     current_life = 100
     
-    def __init__(self, endRoomNum):
+    #life drain when switch rooms.
+    life_drain = 1
+    
+    def __init__(self, endRoomNum, difficulty):
         self.end_room_index = endRoomNum
+        self.difficulty = difficulty
+        self.current_life = int((11-difficulty)*11)
+        life_drain = int((10-difficulty)/5+1)
         #self.difficulty = difficulty
     
     def add_room(self,room_num, portal_list):
@@ -72,11 +78,11 @@ class level:
         self.end_room_index = end_room_index
         
     def drain_life(self, amount):
-        self.current_life = current_life - amount
+        self.current_life = self.current_life - amount
     
     def room_intro(self, cur_room):
-        print "------------------------------------------------------------------------"
-        print "You look around.\n"
+        print "\n"
+        print "You look around...\n"
         #check the surrounding walls for portals.
         #we want to tell the user where they are, and what type of portal it is...
         for i in range(4):
@@ -98,24 +104,27 @@ class level:
         for i in range(4):
             if cur_room.portal_index[i] is not None:
                 print direction[i]
-    
     def change_rooms(self, new_room_index):
         #I know this is bad coding but I'll put the following where it's supposed to be later...
         print ("------------------------------------------------------------------------\n"
                "You step towards the barrier and it begins to fade to black faster. as you pass through, "
                "it shatters like glass, the individual pieces fading to nothingness before they hit the "
-               "ground. You feel the drain on your life force")
+               "ground. You feel the drain on your life force. You have " + str(self.current_life) + " life points left")
+        self.drain_life(self.life_drain)
         self.current_room = new_room_index
-        next = raw_input("Press Enter to continue")
         self.room_intro(self.rooms[self.current_room])
     #dir is short of direction - direction is already a used global variable.
+    def play_a_game(self, difficulty):
+        print "a game"
+        input = raw_input("Press Enter to beat the game...")
+        self.drain_life(-3)
         
     
     #REMEMBER TO PUT A METHOD IN HERE TO 
 #done with object stuff...
 
-def create_level():
-    newLev = level(17)
+def create_level(difficulty):
+    newLev = level(17,difficulty)
     
     #first add the rooms
     newLev.add_room(0,[1, None, None, None])
@@ -158,14 +167,14 @@ def create_level():
     newLev.add_portal(17, 0, [15,14])
     newLev.add_portal(18, 0, [13,16])
     newLev.add_portal(19, 0, [16,15])
-    newLev.add_portal(20, 0, [14,17])
+    newLev.add_portal(20, 3, [14,17])
     
     newLev.set_end_room_index(17)
     
     return newLev
     
 
-def playGame(difficulty, newLev):
+def playGame(newLev):
     newLev.room_intro(newLev.rooms[newLev.current_room])
     running = True #if we ever want to stop...
     #a check we do in the loop. if false, it will skip through the loop and return to
@@ -175,8 +184,9 @@ def playGame(difficulty, newLev):
     com = ""
     while running:
         command_entered = False
+        os.system("title " + "Current lifepoints left: " + str(newLev.current_life))
         try:
-            com = raw_input("Please enter a command: ")
+            com = raw_input("\nPlease enter a command: ")
             if com.upper() in command_list:
                 command_entered = True
         except ValueError: #incase the user typed in ctrl+z or something...
@@ -188,12 +198,13 @@ def playGame(difficulty, newLev):
             if command_list.index(com) < 4:
                 #direction.index(com)
                 if newLev.rooms[newLev.current_room].portal_index[direction.index(com.lower())] is not None:
+                    
                     #for now, we will assume no game barriers are present.
                     new_portal_index = newLev.rooms[newLev.current_room].portal_index[direction.index(com.lower())]
                     newRoom = (newLev.portals[new_portal_index].connected_rooms.index(newLev.current_room)+1) % len(newLev.portals[new_portal_index].connected_rooms)
-                    print str(newLev.portals[new_portal_index].connected_rooms.index(newLev.current_room)+1)
-                    print str(newRoom)
-                    print str(newLev.portals[new_portal_index].connected_rooms)
+                    #check to see if barrier requires a challenge:
+                    if newLev.portals[new_portal_index].barrier_type == 1:
+                        newLev.play_a_game(newLev.current_room)
                     newLev.change_rooms(newLev.portals[new_portal_index].connected_rooms[newRoom])
                 else:
                     print "\nYou may not go in that direction.\n"
@@ -206,7 +217,17 @@ def playGame(difficulty, newLev):
     
 
 def showIntroMenu():
-    print """Welcome, and thank you for playing Nyxeka's Game!
+    print """
+ _   _                _         
+| \ | |              | |        
+|  \| |_   ___  _____| | ____ _ 
+| . ` | | | \ \/ / _ \ |/ / _` |
+| |\  | |_| |>  <  __/   < (_| |
+\_| \_/\__, /_/\_\___|_|\_\__,_|
+        __/ |                   
+       |___/                    
+
+Welcome, and thank you for playing Nyxeka's Game!
 
 This is a bit of a maze-exploring game. Your character is stuck
 inside of a room, in a level created as some sort of test by 
@@ -220,9 +241,13 @@ A barrier is similar to a holographic pane of glass. as you wait
 in the room, it fades to black and shatters. This will happen 
 every 30 seconds. every time a barrier shatters, you will lose
 one life-point. In order to pass some barriers, you must beat a 
-challenge/game. Every time you pass through a barrier, it will
-shatter. Every time you lose a game, all of the barriers in the 
-room will shatter.
+challenge/game, which will be timed. 
+
+Every time you pass through a barrier, it will
+shatter. Every time you lose a challenge, all of the barriers in 
+the room will shatter. If you win a challenge, you will be awarded
+4 life points.
+
 Every time a barrier shatters, it will zap back into exsistence
 once there is nothing blocking the way.
 
@@ -234,12 +259,12 @@ not case sensitive.
 Please select your difficulty level (an integer between 0 and 10:
  
  """
-    difficulty = raw_input("Difficulty ranges from 0(easiest) to 10(hardest): ")
+    difficulty = raw_input("Difficulty ranges from 0 (easiest) to 10 (hardest): ")
     try: 
         newdif = int(difficulty)
     except ValueError:
         print "please enter a number between 0 and 10 >_>"
-        difficulty = raw_input("Difficulty ranges from 0(easiest) to 10(hardest): ")
+        difficulty = raw_input("Difficulty ranges from 0 (easiest) to 10 (hardest): ")
         try: 
             newdif = int(difficulty)
         except ValueError:
@@ -250,7 +275,8 @@ Please select your difficulty level (an integer between 0 and 10:
     return newdif
     
 def main():
-    playGame(showIntroMenu(), create_level())
+    os.system("cls")
+    playGame(create_level(showIntroMenu()))
 
 if __name__ == "__main__":
     main()
