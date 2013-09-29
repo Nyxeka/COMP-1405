@@ -14,7 +14,6 @@ Text-based dungeon crawler in python.
 # imports ###########################
 
 import os
-import ConfigParser
 
 # end imports #######################
 
@@ -48,7 +47,11 @@ class level:
     rooms = []
     portals = []
     end_room_index = 0
+    
+    #player stuff:
     current_room = 0
+    current_life = 100
+    
     
     def __init__(self, endRoomNum):
         self.end_room_index = endRoomNum
@@ -123,8 +126,6 @@ def create_level():
     newLev.add_portal(18, 0, [13,16])
     newLev.add_portal(19, 0, [16,15])
     newLev.add_portal(20, 0, [14,17])
-    
-    
     
     return newLev
     
