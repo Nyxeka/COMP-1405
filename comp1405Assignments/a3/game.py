@@ -66,7 +66,7 @@ win_message = """
 direction = ["north", "south", "east", "west"] #we reference to this...
 
 # come up with commands and put them here to compare with when we want the users input:
-command_list = ["NORTH", "SOUTH", "EAST", "WEST", "HELP", "EXIT", "YES", "NO", "Y", "N", "MAP"]
+command_list = ["NORTH", "SOUTH", "EAST", "WEST", "HELP", "EXIT", "MAP"]
 
 class portal:
     #portals between rooms:
@@ -387,6 +387,7 @@ def playGame(newLev):
                         print win_message
                         raw_input("\n\nPress Enter to quit")
                     else:
+                        #since nothing special, just make the move
                         print ("------------------------------------------------------------------------\n"
                                "You step towards the barrier and it begins to fade to black faster. as you pass through, "
                                "it shatters like glass, the individual pieces fading to nothingness before they hit the "
