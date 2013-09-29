@@ -45,6 +45,24 @@ MAP: display a map of the level
 EXIT: quit the game
 """
 
+game_over_message = """
+ _____   ___  ___  ___ _____   _____  _   _ ___________ 
+|  __ \ / _ \ |  \/  ||  ___| |  _  || | | |  ___| ___ \
+| |  \// /_\ \| .  . || |__   | | | || | | | |__ | |_/ /
+| | __ |  _  || |\/| ||  __|  | | | || | | |  __||    / 
+| |_\ \| | | || |  | || |___  \ \_/ /\ \_/ / |___| |\ \ 
+ \____/\_| |_/\_|  |_/\____/   \___/  \___/\____/\_| \_|
+"""
+
+win_message = """
+ _    _ _____ _   _ _   _ ___________ 
+| |  | |_   _| \ | | \ | |  ___| ___ \
+| |  | | | | |  \| |  \| | |__ | |_/ /
+| |/\| | | | | . ` | . ` |  __||    / 
+\  /\  /_| |_| |\  | |\  | |___| |\ \ 
+ \/  \/ \___/\_| \_|_| \_|____/\_| \_|
+"""
+
 direction = ["north", "south", "east", "west"] #we reference to this...
 
 # come up with commands and put them here to compare with when we want the users input:
@@ -92,7 +110,7 @@ class level:
     def __init__(self, endRoomNum, difficulty):
         self.end_room_index = endRoomNum
         self.difficulty = difficulty
-        self.current_life = int((11-difficulty)*11)
+        self.current_life = int(20+50/difficulty)
         life_drain = int((10-difficulty)/5+1)
         #self.difficulty = difficulty
     
@@ -127,21 +145,20 @@ class level:
             elif self.portals[cur_room.portal_index[i]].barrier_type == 3:
                 print "To the " + direction[i] + " IS THE END."
             print "\n"
-            time.sleep(1.5)
+            time.sleep(0.5)
         print "The number on the floor says: " + str(cur_room.room_num)
         #clarify the user...
         print "\nYou may go in the direction(s):"
         for i in range(4):
             if cur_room.portal_index[i] is not None:
                 print direction[i]
-                time.sleep(0.7)
+                time.sleep(0.5)
     def change_rooms(self, new_room_index):
-        #I know this is bad coding but I'll put the following where it's supposed to be later...
-        print "You have " + str(self.current_life) + " life points left"
         time.sleep(1)
         self.drain_life(self.life_drain)
         self.current_room = new_room_index
         self.room_intro(self.rooms[self.current_room])
+        
     #dir is short of direction - direction is already a used global variable.
     def play_challenge(self, difficulty):
         #lots to do here...
@@ -151,7 +168,7 @@ class level:
         #from 7 to 13: guess my number 2**difficulty
         #from 14 to 20: addition/subtraction triple digit. (get 3/5 right)
         
-        if (difficulty < 7):
+        if difficulty < 7:
             print """
 This will be a simple two-digit number addition challenge.
 I will ask you three questions. get two out of three to pass without losing life-points
@@ -183,10 +200,86 @@ get none right, and all of the surrounding barriers in your room will shatter.
                         self.drain_life(self.life_drain)
             elif numCorrect == 2:
                 self.drain_life(-self.life_drain)
+                print "You answered 2 out of 3 questions right. you will move on unpenalized."
             elif numCorrect == 3:
+                print "You answered all three questions correctly. Enjoy your reward."
                 self.drain_life(-3 * self.life_drain)
+        elif difficulty > 6 and difficulty < 14:
+            print """
+Your challenge will be a guess my number game.
+I will give you a number between 1 and x where x is 2 to the exponent <your floor number>
+if you guess too low, you will be told to guess higher.
+if you guess too high, you will be told to guess lower.
+You have as many guesses as you do your floor number to pass this challenge and be awarded
+3x the usual life points drained by passing a barrier.
+If your guesses surpass your floor number, you have failed the test.
+If your guesses are under your floor number, you will get a bonus.
+
+"""
+            raw_input("Press Enter to continue.")
+            numGuesses = 0
+            answer = str(random.randrange(1,int(2.0**difficulty)))
+            print "I have chosen a number between 1 and " + str(int(2.0**difficulty))
+            for i in range(difficulty):
+                guess = raw_input("Please enter your guess: ")
+                numGuesses += 1
+                try:
+                    if int(guess) == answer:
+                        break
+                    if int(guess) > answer:
+                        print "Your guess was too high"
+                    if int(guess) < answer:
+                        print "your guess was too low"
+                except ValueError:
+                    print "please input a number."
+            if answer == guess:
+                print "You got the correct answer in " + numGuesses + " guesses."
+                print "you will be rewarded."
+                self.drain_life((-3 * self.life_drain) + difficulty - numGuesses)
+            elif not guess == answer:
+                print "you did not pass the test."
+                time.sleep(1)
+                print "All of the barriers around you flash to black and shatter as you"
+                print "make your way to the next room"
+                for i in self.rooms[self.current_room]:
+                    if i is not None:
+                        self.drain_life(self.life_drain)
+                        
+        elif difficulty >= 14:
+            print """
+This will be a three-digit addition game.
+get 3/5 of the answers right to pass.
+Get 4/5 or 5/5 
+"""
+            go = raw_input("Press Enter to continue and start the challenge.")
+            numCorrect = 0
+            for i in range(3):
+                a = random.randrange(1,999)
+                b = random.randrange(1,999)
+                answer = str(a+b)
+                print "Question %d" % (i+1)
+                guess = raw_input(str(a) + " + " + str(b) + " = ")
+                if guess == answer:
+                    numCorrect += 1
+                    time.sleep(0.5)
+                    print "Correct!"
+                else:
+                    print "Incorrect! The correct answer was " + str(answer)
+            if numCorrect  == 0:
+                print "Unfortunately, you answered all of the questions wrong."
+                time.sleep(1)
+                print "All of the barriers around you flash to black and shatter as you"
+                print "make your way to the next room"
+                for i in self.rooms[self.current_room]:
+                    if i is not None:
+                        self.drain_life(self.life_drain)
+            elif numCorrect <= 3 and numCorrect > 0:
+                self.drain_life(-self.life_drain)
+                print "You answered between 1 and 3 questions right. you will move on unpenalized."
+            elif numCorrect > 3:
+                print "You answered more than 3 questions correctly. Enjoy your reward."
+                self.drain_life(-3 * self.life_drain + -1 * self.life_drain * numCorrect - 4)
         
-            
 #done with class stuff...
 
 def create_level(difficulty):
@@ -243,6 +336,8 @@ def create_level(difficulty):
 def playGame(newLev):
     newLev.room_intro(newLev.rooms[newLev.current_room])
     running = True #if we ever want to stop...
+    lost = False
+    
     #a check we do in the loop. if false, it will skip through the loop and return to
     #asking for the command
     command_entered = False
@@ -250,7 +345,12 @@ def playGame(newLev):
     com = ""
     while running:
         command_entered = False
+        print "\nYou have " + str(newLev.current_life) + " life points left"
         os.system("title " + "Current lifepoints left: " + str(newLev.current_life))
+        if newLev.current_life <= 0:
+            break
+            lost = True
+        
         try:
             com = raw_input("\nPlease enter a command: ")
             if com.upper() in command_list:
@@ -277,6 +377,12 @@ def playGame(newLev):
                                "it shatters like glass, the individual pieces fading to nothingness before they hit the "
                                "ground. You feel the drain on your life force. ")
                         time.sleep(1)
+                    else:
+                        print "You have found the end!"
+                        print "You made it with " + newLev.current_life + " lifepoints left!"
+                        os.system("cls")
+                        print win_message
+                        raw_input("\n\nPress Enter to quit")
                     newLev.change_rooms(newLev.portals[new_portal_index].connected_rooms[newRoom])
                 else:
                     print "\nYou may not go in that direction.\n"
@@ -287,6 +393,10 @@ def playGame(newLev):
             if com == "EXIT":
                 print "Exit called, quitting."
                 break
+    if lost:
+        os.system(cls)
+        print game_over_message
+        raw_input("Press Enter to Quit.")
         
     
 
