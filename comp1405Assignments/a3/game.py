@@ -380,12 +380,15 @@ def playGame(newLev):
             com = raw_input("\nPlease enter a command: ")
             if com.upper() in command_list:
                 command_entered = True
-        except ValueError: #incase the user typed in ctrl+z or something...
+            if debug and com[0:4] in command_list:
+                command_entered = True
+                print "debuggezz"
+        except ValueError: #just in case...
             print "ValueError: please type a string >_>"
-    #now we want to check the command, and do stuff about it!
-    #yay I get to use my super awesome portal system!
+        #now we want to check the command, and do stuff about it!
         if command_entered == True:
             com = com.upper()
+            
             if command_list.index(com) < 4:
                 #direction.index(com)
                 if newLev.rooms[newLev.current_room].portal_index[direction.index(com.lower())] is not None:
@@ -411,12 +414,13 @@ def playGame(newLev):
                     newLev.change_rooms(newLev.portals[new_portal_index].connected_rooms[newRoom])
                 else:
                     print "\nYou may not go in that direction.\n"
+            if com[0:4] == "GOTO" and debug == True:
+                    print "changing rooms..."
+                    newLev.change_rooms(int(com[5:]))
             if com == "HELP":
                 print help_message
             if com == "MAP":
                 print map
-            if com[:4] == "GOTO":
-                newLev.change_rooms(int(com[5:]))
             if com == "EXIT":
                 print "Exit called, quitting."
                 break
@@ -499,6 +503,7 @@ Please select your difficulty level (an integer between 0 and 10:
     difficulty = raw_input("Difficulty ranges from 0 (easiest) to 10 (hardest): ")
     if difficulty == "debug":
         debug = True
+        print "debug enabled"
     try: 
         newdif = int(difficulty)
     except ValueError:
