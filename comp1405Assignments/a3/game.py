@@ -68,7 +68,7 @@ debug = False
 direction = ["north", "south", "east", "west"] #we reference to this...
 
 # come up with commands and put them here to compare with when we want the users input:
-command_list = ["NORTH", "SOUTH", "EAST", "WEST", "HELP", "EXIT", "MAP", "GOTO"]
+command_list = ["NORTH", "SOUTH", "EAST", "WEST", "HELP", "EXIT", "MAP"]
 
 class portal:
     #portals between rooms:
@@ -359,10 +359,10 @@ def create_level(difficulty):
     
 
 def playGame(newLev):
+    global debug
     newLev.room_intro(newLev.rooms[newLev.current_room])
     running = True #if we ever want to stop...
     lost = False
-    
     #a check we do in the loop. if false, it will skip through the loop and return to
     #asking for the command
     command_entered = False
@@ -370,6 +370,7 @@ def playGame(newLev):
     com = ""
     while running:
         command_entered = False
+        command_debug = False
         print "\nYou have " + str(newLev.current_life) + " life points left"
         os.system("title " + "Current lifepoints left: " + str(newLev.current_life))
         if newLev.current_life <= 0:
@@ -380,31 +381,33 @@ def playGame(newLev):
             com = raw_input("\nPlease enter a command: ")
             if com.upper() in command_list:
                 command_entered = True
-            if debug and com[0:4] in command_list:
-                command_entered = True
+            if debug and com[0:4] == "GOTO":
+                command_debug = True
                 print "debuggezz"
         except ValueError: #just in case...
             print "ValueError: please type a string >_>"
         #now we want to check the command, and do stuff about it!
         if command_entered == True:
             com = com.upper()
-            
+            #if it's a directional command:
             if command_list.index(com) < 4:
-                #direction.index(com)
+                
                 if newLev.rooms[newLev.current_room].portal_index[direction.index(com.lower())] is not None:
                     
-                    #for now, we will assume no game barriers are present.
                     new_portal_index = newLev.rooms[newLev.current_room].portal_index[direction.index(com.lower())]
                     newRoom = (newLev.portals[new_portal_index].connected_rooms.index(newLev.current_room)+1) % len(newLev.portals[new_portal_index].connected_rooms)
                     #check to see if barrier requires a challenge:
                     if newLev.portals[new_portal_index].barrier_type == 1:
+                        #came up to a challenge!
                         newLev.play_challenge(newLev.current_room)
                     elif newLev.portals[new_portal_index].barrier_type == 3:
+                        #Game over, user wins
                         print "You have found the end!"
                         print "You made it with " + str(newLev.current_life) + " lifepoints left!"
                         os.system("cls")
                         print win_message
                         raw_input("\n\nPress Enter to quit")
+                        break
                     else:
                         #since nothing special, just make the move
                         print ("\nYou step towards the barrier and it begins to fade to black faster. as you pass through,\n"
@@ -414,9 +417,6 @@ def playGame(newLev):
                     newLev.change_rooms(newLev.portals[new_portal_index].connected_rooms[newRoom])
                 else:
                     print "\nYou may not go in that direction.\n"
-            if com[0:4] == "GOTO" and debug == True:
-                    print "changing rooms..."
-                    newLev.change_rooms(int(com[5:]))
             if com == "HELP":
                 print help_message
             if com == "MAP":
@@ -424,6 +424,10 @@ def playGame(newLev):
             if com == "EXIT":
                 print "Exit called, quitting."
                 break
+        if command_debug:
+            if com[0:4] == "GOTO":
+                print "changing rooms..."
+                newLev.change_rooms(int(com[5:]))
     if lost:
         os.system(cls)
         print game_over_message
@@ -432,7 +436,8 @@ def playGame(newLev):
     
 
 def showIntroMenu():
-    print "I"
+    global debug
+    """print "I"
     time.sleep(0.4)
     os.system("cls")
     print "I want"
@@ -457,7 +462,7 @@ def showIntroMenu():
     time.sleep(1)
     os.system("cls")
     print "I want to play a game..."
-    time.sleep(2.5)
+    time.sleep(2.5)"""
     print """
  _   _                _         
 | \ | |              | |        
@@ -503,7 +508,7 @@ Please select your difficulty level (an integer between 0 and 10:
     difficulty = raw_input("Difficulty ranges from 0 (easiest) to 10 (hardest): ")
     if difficulty == "debug":
         debug = True
-        print "debug enabled"
+        print "debug enabled: " + str(debug)
     try: 
         newdif = int(difficulty)
     except ValueError:
@@ -515,7 +520,7 @@ Please select your difficulty level (an integer between 0 and 10:
             print "Or whatever. defaulting to 5."
             newdif = 5
     newdif = newdif % 10
-    print "You start your journey... Opening your eyes, you realize that you are laying down."
+    print "\nYou start your journey... Opening your eyes, you realize that you are laying down."
     print "you stand."
     time.sleep(1)
     print "---------------------------------------------"
