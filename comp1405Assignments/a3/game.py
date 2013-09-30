@@ -20,7 +20,7 @@ import os, sys, time, random
 map = """
 MAP:
     03--04--05
-    ||  ||  ||
+    ||      ||
 01--02--07--06--11     00:          start room
 ^^  ||          ||     17:          end room
 00  08--09--10>>12     <<,>>,^^,vv: one-way barrier
@@ -112,8 +112,8 @@ class level:
     def __init__(self, endRoomNum, difficulty):
         self.end_room_index = endRoomNum
         self.difficulty = difficulty
-        self.current_life = int(20+50/difficulty)
-        life_drain = int((10-difficulty)/5+1)
+        self.current_life = int(20 + (50 / difficulty))
+        life_drain = int(((10 - difficulty) / 5) + 1)
         #self.difficulty = difficulty
     
     def add_room(self,room_num, portal_list):
@@ -174,7 +174,7 @@ class level:
         time.sleep(1.5)
         if floor_number < 7:
             self.play_easy_challenge(floor_number)
-        elif floor_number > 6 and floor_number < 14:
+        elif floor_number >= 7 and floor_number < 14:
             self.play_medium_challenge(floor_number)
         elif floor_number >= 14:
             self.play_hard_challenge(floor_number)
@@ -241,27 +241,30 @@ If your guesses are under your floor number, you will get a bonus.
 """
         raw_input("Press Enter to continue.")
         numGuesses = 0
-        answer = str(random.randrange(1,int(2.0**floor_number)))
-        print "I have chosen a number between 1 and " + str(int(2.0**floor_number))
-        for i in range(floor_number):
+        maximum = int(2.0**floor_number)
+        answer = random.randrange(1,maximum)
+        print "I have chosen a number between 1 and " + str(maximum)
+        for i in range(floor_number+2):
             guess = raw_input("Please enter your guess: ")
+            guess = int(guess)
             numGuesses += 1
+            print "You guessed: " + str(guess)
             try:
-                if int(guess) == answer:
+                if guess == answer:
                     break
-                if int(guess) > answer:
+                if guess > answer:
                     print "Your guess was too high"
-                if int(guess) < answer:
-                    print "your guess was too low"
+                if guess < answer:
+                    print "Your guess was too low"
             except ValueError:
-                print "please input a number."
+                print "Please input a number."
         if answer == guess:
             print "You got the correct answer in " + numGuesses + " guesses."
-            print "you will be rewarded."
+            print "You will be rewarded."
             self.drain_life((-3 * self.life_drain) + floor_number - numGuesses)
-        elif not guess == answer:
-            print "you did not pass the test."
-            print "the answer was: " + str(answer)
+        else:
+            print "You did not pass the test."
+            print "The answer was: " + str(answer)
             time.sleep(1)
             print "All of the barriers around you flash to black and shatter as you"
             print "make your way to the next room"
@@ -278,8 +281,8 @@ Get 4/5 or 5/5
         go = raw_input("Press Enter to continue and start the challenge.")
         numCorrect = 0
         for i in range(3):
-            a = random.randrange(1,999)
-            b = random.randrange(1,999)
+            a = random.randrange(1,1000)
+            b = random.randrange(1,1000)
             answer = str(a+b)
             print "Question %d" % (i+1)
             guess = raw_input(str(a) + " + " + str(b) + " = ")
@@ -302,7 +305,8 @@ Get 4/5 or 5/5
             print "You answered between 1 and 3 questions right. you will move on unpenalized."
         elif numCorrect > 3:
             print "You answered more than 3 questions correctly. Enjoy your reward."
-            self.drain_life(-3 * self.life_drain + -1 * self.life_drain * numCorrect - 4)
+            #default reward plus 1 if you got 5/5
+            self.drain_life((-3 * self.life_drain) + ((-1 * self.life_drain * numCorrect) - 4))
                         
         
 #done with class stuff...
@@ -331,6 +335,11 @@ def create_level(difficulty):
     newLev.add_room(17,[None,None,None,None])
     #now add the portals:
     #add_portal(self, portal_num, portal_type: 0,1,2,3 connected_rooms: must be in order if one-way)
+    #barrier types:
+    #0 - normal barrier
+    #1 - challenge barrier
+    #2 - one-way barrier
+    #3 - the barrier leading to the end game room.
     newLev.add_portal(0, 2, [100,100]) #forgot to add 0 as I drew the level map. oh well.
     newLev.add_portal(1, 2, [0,1])
     newLev.add_portal(2, 0, [1,2])
@@ -520,6 +529,7 @@ Please select your difficulty level (an integer between 0 and 10:
             print "Or whatever. defaulting to 5."
             newdif = 5
     newdif = newdif % 10
+    newdif = max(1, newdif)
     print "\nYou start your journey... Opening your eyes, you realize that you are laying down."
     print "you stand."
     time.sleep(1)
