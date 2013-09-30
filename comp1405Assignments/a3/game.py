@@ -65,6 +65,11 @@ win_message = """
 
 debug = False
 
+BARRIER_TYPE_NORMAL = 0
+BARRIER_TYPE_CHALLENGE = 1
+BARRIER_TYPE_ONE_WAY = 2
+BARRIER_TYPE_FINISH = 3
+
 direction = ["north", "south", "east", "west"] #we reference to this...
 
 # come up with commands and put them here to compare with when we want the users input:
@@ -340,27 +345,27 @@ def create_level(difficulty):
     #1 - challenge barrier
     #2 - one-way barrier
     #3 - the barrier leading to the end game room.
-    newLev.add_portal(0, 2, [100,100]) #forgot to add 0 as I drew the level map. oh well.
-    newLev.add_portal(1, 2, [0,1])
-    newLev.add_portal(2, 0, [1,2])
-    newLev.add_portal(3, 0, [2,3])
-    newLev.add_portal(4, 0, [3,4])
-    newLev.add_portal(5, 0, [4,5])
-    newLev.add_portal(6, 0, [5,6])
-    newLev.add_portal(7, 1, [7,6])
-    newLev.add_portal(8, 1, [2,7])
-    newLev.add_portal(9, 0, [2,8])
-    newLev.add_portal(10, 0, [8,9])
-    newLev.add_portal(11, 0, [9,10])
-    newLev.add_portal(12, 0, [10,12])
-    newLev.add_portal(13, 0, [6,11])
-    newLev.add_portal(14, 0, [11,12])
-    newLev.add_portal(15, 0, [12,13])
-    newLev.add_portal(16, 0, [10,14])
-    newLev.add_portal(17, 0, [15,14])
-    newLev.add_portal(18, 0, [13,16])
-    newLev.add_portal(19, 0, [16,15])
-    newLev.add_portal(20, 3, [14,17])
+    newLev.add_portal(0, BARRIER_TYPE_ONE_WAY, [100,100]) #forgot to add 0 as I drew the level map. oh well.
+    newLev.add_portal(1, BARRIER_TYPE_ONE_WAY, [0,1])
+    newLev.add_portal(2, BARRIER_TYPE_NORMAL, [1,2])
+    newLev.add_portal(3, BARRIER_TYPE_NORMAL, [2,3])
+    newLev.add_portal(4, BARRIER_TYPE_NORMAL, [3,4])
+    newLev.add_portal(5, BARRIER_TYPE_NORMAL, [4,5])
+    newLev.add_portal(6, BARRIER_TYPE_NORMAL, [5,6])
+    newLev.add_portal(7, BARRIER_TYPE_CHALLENGE, [7,6])
+    newLev.add_portal(8, BARRIER_TYPE_CHALLENGE, [2,7])
+    newLev.add_portal(9, BARRIER_TYPE_NORMAL, [2,8])
+    newLev.add_portal(10, BARRIER_TYPE_NORMAL, [8,9])
+    newLev.add_portal(11, BARRIER_TYPE_CHALLENGE, [9,10])
+    newLev.add_portal(12, BARRIER_TYPE_NORMAL, [10,12])
+    newLev.add_portal(13, BARRIER_TYPE_NORMAL, [6,11])
+    newLev.add_portal(14, BARRIER_TYPE_NORMAL, [11,12])
+    newLev.add_portal(15, BARRIER_TYPE_NORMAL, [12,13])
+    newLev.add_portal(16, BARRIER_TYPE_CHALLENGE, [10,14])
+    newLev.add_portal(17, BARRIER_TYPE_NORMAL, [15,14])
+    newLev.add_portal(18, BARRIER_TYPE_CHALLENGE, [13,16])
+    newLev.add_portal(19, BARRIER_TYPE_NORMAL, [16,15])
+    newLev.add_portal(20, BARRIER_TYPE_FINISH, [14,17])
     
     newLev.set_end_room_index(17)
     
