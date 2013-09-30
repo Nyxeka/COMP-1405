@@ -63,10 +63,12 @@ win_message = """
  \/  \/ \___/\_| \_|_| \_|____/\_| \_|
 """
 
+debug = False
+
 direction = ["north", "south", "east", "west"] #we reference to this...
 
 # come up with commands and put them here to compare with when we want the users input:
-command_list = ["NORTH", "SOUTH", "EAST", "WEST", "HELP", "EXIT", "MAP"]
+command_list = ["NORTH", "SOUTH", "EAST", "WEST", "HELP", "EXIT", "MAP", "GOTO"]
 
 class portal:
     #portals between rooms:
@@ -167,15 +169,17 @@ class level:
         #from 0 to 6, we will go for simple double-digit addition questions(get 2/3 right)
         #from 7 to 13: guess my number 2**floor_number
         #from 14 to 20: addition/subtraction triple digit. (get 3/5 right)
-        
+        print "You walk towards the computer desk and sit down. as you sit,\na console appears on the computer screen."
+        print "On the console, it says:"
+        time.sleep(1.5)
         if floor_number < 7:
-            play_easy_challenge(floor_number)
+            self.play_easy_challenge(floor_number)
         elif floor_number > 6 and floor_number < 14:
-            play_medium_challenge(floor_number)
+            self.play_medium_challenge(floor_number)
         elif floor_number >= 14:
-            play_hard_challenge(floor_number)
+            self.play_hard_challenge(floor_number)
                 
-    def play_easy_challenge(floor_number):
+    def play_easy_challenge(self, floor_number):
         print """
 This will be a simple two-digit number addition challenge.
 I will ask you three questions. get two out of three to pass without losing life-points
@@ -202,17 +206,28 @@ get none right, and all of the surrounding barriers in your room will shatter.
             time.sleep(1)
             print "All of the barriers around you flash to black and shatter as you"
             print "make your way to the next room"
-            for i in self.rooms[self.current_room]:
+            for i in self.rooms[self.current_room].portal_index:
                 if i is not None:
                     self.drain_life(self.life_drain)
+        elif numCorrect == 1:
+            print ("\nYou step towards the barrier and it begins to fade to black faster. as you pass through,\n"
+                               "it shatters like glass, the individual pieces fading to nothingness before they hit the\n"
+                               "ground. You feel the drain on your life force.\n")
+            time.sleep(1)
         elif numCorrect == 2:
             self.drain_life(-self.life_drain)
             print "You answered 2 out of 3 questions right. you will move on unpenalized."
+            print "\nYou continue your journey, passing through the invisible barrier, which snaps"
+            print "back into place after you step inside the room."
+            time.sleep(1)
         elif numCorrect == 3:
             print "You answered all three questions correctly. Enjoy your reward."
+            print "\nYou continue your journey, passing through the invisible barrier, which snaps"
+            print "back into place after you step inside the room. You feel your health replenish slightly."
             self.drain_life(-3 * self.life_drain)
+            time.sleep(1)
     
-    def play_medium_challenge(floor_number):
+    def play_medium_challenge(self, floor_number):
         print """
 Your challenge will be a guess my number game.
 I will give you a number between 1 and x where x is 2 to the exponent <your floor number>
@@ -246,14 +261,15 @@ If your guesses are under your floor number, you will get a bonus.
             self.drain_life((-3 * self.life_drain) + floor_number - numGuesses)
         elif not guess == answer:
             print "you did not pass the test."
+            print "the answer was: " + str(answer)
             time.sleep(1)
             print "All of the barriers around you flash to black and shatter as you"
             print "make your way to the next room"
-            for i in self.rooms[self.current_room]:
+            for i in self.rooms[self.current_room].portal_index:
                 if i is not None:
                     self.drain_life(self.life_drain)
                         
-    def play_hard_challenge(floor_number):
+    def play_hard_challenge(self, floor_number):
         print """
 This will be a three-digit addition game.
 get 3/5 of the answers right to pass.
@@ -278,7 +294,7 @@ Get 4/5 or 5/5
             time.sleep(1)
             print "All of the barriers around you flash to black and shatter as you"
             print "make your way to the next room"
-            for i in self.rooms[self.current_room]:
+            for i in self.rooms[self.current_room].portal_index:
                 if i is not None:
                     self.drain_life(self.life_drain)
         elif numCorrect <= 3 and numCorrect > 0:
@@ -382,16 +398,15 @@ def playGame(newLev):
                         newLev.play_challenge(newLev.current_room)
                     elif newLev.portals[new_portal_index].barrier_type == 3:
                         print "You have found the end!"
-                        print "You made it with " + newLev.current_life + " lifepoints left!"
+                        print "You made it with " + str(newLev.current_life) + " lifepoints left!"
                         os.system("cls")
                         print win_message
                         raw_input("\n\nPress Enter to quit")
                     else:
                         #since nothing special, just make the move
-                        print ("------------------------------------------------------------------------\n"
-                               "You step towards the barrier and it begins to fade to black faster. as you pass through, "
-                               "it shatters like glass, the individual pieces fading to nothingness before they hit the "
-                               "ground. You feel the drain on your life force. ")
+                        print ("\nYou step towards the barrier and it begins to fade to black faster. as you pass through,\n"
+                               "it shatters like glass, the individual pieces fading to nothingness before they hit the\n"
+                               "ground. You feel the drain on your life force.\n")
                         time.sleep(1)
                     newLev.change_rooms(newLev.portals[new_portal_index].connected_rooms[newRoom])
                 else:
@@ -400,6 +415,8 @@ def playGame(newLev):
                 print help_message
             if com == "MAP":
                 print map
+            if com[:4] == "GOTO":
+                newLev.change_rooms(int(com[5:]))
             if com == "EXIT":
                 print "Exit called, quitting."
                 break
@@ -457,10 +474,10 @@ The goal of the game is to get to the end without losing all of
 your life-points. You will start with 100 life-points, in a room.
 
 A room has four sides. each side either has a barrier or a wall.
-A barrier is similar to a holographic pane of glass. as you wait
-in the room, it fades to black and shatters. This will happen 
-every 30 seconds. every time a barrier shatters, you will lose
-one life-point. In order to pass some barriers, you must beat a 
+A barrier is similar to a holographic pane of glass. As you get 
+closer to a barrier, it darkens until it becomes pitch-black, then
+shatters like glass, quickly fading before hitting the ground.
+In order to pass some barriers, you must beat a 
 challenge/game, which will be timed. 
 
 Every time you pass through a barrier, it will
@@ -480,6 +497,8 @@ Please select your difficulty level (an integer between 0 and 10:
  
  """
     difficulty = raw_input("Difficulty ranges from 0 (easiest) to 10 (hardest): ")
+    if difficulty == "debug":
+        debug = True
     try: 
         newdif = int(difficulty)
     except ValueError:
@@ -491,7 +510,10 @@ Please select your difficulty level (an integer between 0 and 10:
             print "Or whatever. defaulting to 5."
             newdif = 5
     newdif = newdif % 10
-    
+    print "You start your journey... Opening your eyes, you realize that you are laying down."
+    print "you stand."
+    time.sleep(1)
+    print "---------------------------------------------"
     return newdif
     
 def main():
