@@ -1,0 +1,27 @@
+PS C:\Users\Nicholas\code\projects\comp1405Assignments\a3> python -Q new -i game.py
+>>> myLevel = create_level()
+>>> myLevel.change_rooms(2)
+------------------------------------------------------------------------
+You step towards the barrier and it begins to fade to black faster. as you pass through, it shatters like glass, the ind
+ividual pieces fading to nothingness before they hit the ground. You feel the drain on your life force
+Press Enter to continue
+------------------------------------------------------------------------
+You look around.
+
+portal 3
+To the north there is a barrier.
+portal 9
+To the south there is a barrier.
+To the east there is a barrier with a desktop computer in front of it, on a desk.
+The computer screen has some text on it that says 'if you go in this direction, you must play my game.'
+portal 2
+To the west there is a barrier.
+
+You may go in the direction(s):
+north
+south
+east
+west
+>>> ^Z
+
+PS C:\Users\Nicholas\code\projects\comp1405Assignments\a3>
