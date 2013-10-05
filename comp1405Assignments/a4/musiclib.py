@@ -7,8 +7,15 @@ case INSENSITIVE, there will be no "S" function, only an "s" function.
 
 """
 import os
+#all of the mutagen files for the bonus question:
 from mutagen.mp3 import MP3
+from mutagen.ogg import OggFileType
+from mutagen.mp4 import MP4
+from mutagen.flac import FLAC
+from mutagen.asf import ASF
+from mutagen.apev2 import APEv2
 
+#since we use it twice, we'll stick it here.
 help_message = """
 Search through the music library with these commands:
 st [SEARCH TERM] <- search for track's with [SEARCH TERM] in them
@@ -18,6 +25,8 @@ exit <- exit the search function
 """
 
 class Track:
+    #track class, has simple info about each music file
+    #also has a string representation, in case we want to print it
     artist = ""
     title = ""
     album = None
@@ -33,6 +42,8 @@ class Track:
         self.album = album
     
 class Album:
+    #album class, has simple info and a list of its tracks
+    #also has a string representation, incase we want to print it
     artist = ""
     title = ""
     year = ""
@@ -51,8 +62,14 @@ class Album:
     
     def __str__(self):
         return "Album: " + self.title + ", by: " + self.artist
+    
+    def print_tracks(self):
+        print self.__str__() + ":"
+        for i in self.list_of_tracks:
+            print "    " + i
 
 def music_library(tracks, albums):
+    #this is our search function. We use this to search through our media library
     command_origin = ""
     global help_message
     while not command_origin.lower() == "exit":
@@ -101,7 +118,29 @@ def music_library(tracks, albums):
         except:
             print "There was an Error: " + sys.exc_info()[0]
 
+# some code in the load_library function was taken from the assignment page:
+"""
+ORIGINAL CODE:
+
+import os
+from mutagen.mp3 import MP3
+
+for root, dirs, files in os.walk("."):
+    for filename in files:
+        if filename.lower().endswith(".mp3"):
+            fullname = os.path.join(root, filename)
+            print "\n%s" % fullname
+            try:
+                audio = MP3(fullname)
+                for key in audio:
+                    print "  %s: %s" % (key, str(audio[key]))
+            except:
+                print "Error on %s" % fullname
+
+"""
 def load_library(dir="."):
+    #this function will basically search through all the music files in a directory
+    #and return the albums and tracks.
     failed = False
     tracks = []
     albums = {}
@@ -114,44 +153,60 @@ def load_library(dir="."):
     for root, dirs, files in os.walk(dir):
         
         for filename in files:
-            if filename.lower().endswith(".mp3"):
-                fullname = os.path.join(root, filename)
-                #print "\n%s" % fullname
-                
-                try:
+            fullname = os.path.join(root, filename)#put this up here...
+            
+            try:
+                #check for file-type...
+                if filename.lower().endswith(".mp3"):
                     audio = MP3(fullname)
-                    try:
-                        album_title = str(audio['TALB'])
-                    except KeyError:
-                        album_title = ""
-                    try:
-                        track_title = str(audio['TIT2'])
-                    except KeyError:
-                        track_title = ""
-                    try:
-                        track_year = str(audio['TDRC'])
-                    except KeyError:
-                        track_year = ""
-                    try:
-                        track_genre = str(audio['TCON'])
-                    except KeyError:
-                        track_genre = ""
-                    try:
-                        track_artist = str(audio['TPE1'])
-                    except KeyError:
-                        track_artist = ""
-                    track_to_add = [Track(track_artist, track_title, album_title)]
-                    tracks += track_to_add
-                    # here we are going to check for when something is empty...
-                    
-                    
-                    if not album_title in albums:
-                        albums.update({album_title: Album(track_artist, album_title, track_year, track_genre,track_to_add)})
-                    elif album_title in albums:
-                        albums[album_title].add_track(track_to_add)
-                except:
-                    #print "Error on %s" % fullname
-                    pass
+                elif filename.lower().endswith(".ogg"):
+                    audio = OggFileType(fullname)
+                elif filename.lower().endswith(".flac"):
+                    audio = FLAC(fullname)
+                elif filename.lower().endswith(".apev2"):
+                    audio = APEv2(fullname)
+                elif filename.lower().endswith(".mp4"):
+                    audio = MP4(fullname)
+                elif filename.lower().endswith(".asf"):
+                    audio = ASF(fullname)
+                
+                #now since some of the mp3's given don't have certain ID3 tags...
+                #if they don't, they won't end up in the dictionary, so we will
+                #just set them to be empty
+                try:
+                    album_title = str(audio['TALB'])
+                except KeyError:
+                    album_title = ""
+                try:
+                    track_title = str(audio['TIT2'])
+                except KeyError:
+                    track_title = ""
+                try:
+                    track_year = str(audio['TDRC'])
+                except KeyError:
+                    track_year = ""
+                try:
+                    track_genre = str(audio['TCON'])
+                except KeyError:
+                    track_genre = ""
+                try:
+                    track_artist = str(audio['TPE1'])
+                except KeyError:
+                    track_artist = ""
+                track_to_add = [Track(track_artist, track_title, album_title)]
+                tracks += track_to_add
+                # here we are going to check for when something is empty...
+                
+                #we are using a dictionary for album because it makes it easier to check and 
+                #see if an album already exists.
+                if not album_title in albums:
+                    albums.update({album_title: Album(track_artist, album_title, track_year, track_genre,track_to_add)})
+                elif album_title in albums:
+                    albums[album_title].add_track(track_to_add)
+            except:
+                #print "Error on %s" % fullname
+                pass
+    #since we are done with searching for album names, we can convert albums to a list:
     for i,c in albums.items():
         albums2 += [c]
     return [tracks, albums2]
