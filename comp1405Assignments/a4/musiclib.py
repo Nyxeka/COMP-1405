@@ -2,9 +2,20 @@
 Assignment 4: Music Library
 By Nicholas Hylands
 
+NOTE: since it was made explicitly clear in the assignment page that everything should be
+case INSENSITIVE, there will be no "S" function, only an "s" function.
+
 """
 import os
 from mutagen.mp3 import MP3
+
+help_message = """
+Search through the music library with these commands:
+st [SEARCH TERM] <- search for track's with [SEARCH TERM] in them
+sa [SEARCH TERM] <- search for artists with [SEARCH TERM] in them
+s [SEARCH TERM] <- search for albums with [SEARCH TERM] in them
+exit <- exit the search function
+"""
 
 class Track:
     artist = ""
@@ -42,39 +53,64 @@ class Album:
         return "Album: " + self.title + ", by: " + self.artist
 
 def music_library(tracks, albums):
-    command = ""
-    while not command.lower() == "exit":
+    command_origin = ""
+    global help_message
+    while not command_origin.lower() == "exit":
         try:
-            command = raw_input("Enter a command (s, sa, st, help, or exit): ")
-            command = command.lower()
-            if command[:2] == "s ":
+            command_origin = raw_input("Enter a command (s, sa, st, help, or exit): ")
+            command = command_origin.lower()
+            
+            if command_origin[:2] == "S ":
+                print "All tracks and albums with '" + command[2:] + "' in them:"
+                for i in albums:
+                    if command[2:] in i.title.lower():
+                        print "  " + i.__str__()
+                for i in tracks:
+                    if command[2:] in i.title.lower():
+                        print "  " + i.__str__()
+                print ""
+                continue
+            elif command[:2] == "s ":
                 print "All albums with '" + command[2:] + "' in them:"
-                for i,c in albums.items():
-                    if command[2:] in c.title.lower():
-                        print c.__str__()
-            if command[:2] == "sa":
+                for i in albums:
+                    if command[2:] in i.title.lower():
+                        print "  " + i.__str__()
+                print ""
+                continue
+            elif command[:2] == "sa":
                 print "All artists with '" + command[3:] + "' in them:"
-                for i,c in albums.items():
-                    if command[3:] in c.artist.lower():
-                        print c.artist
-            if command[:2] == "st":
+                for i in albums:
+                    if command[3:] in i.artist.lower():
+                        print "  " + i.artist
+                print ""
+                continue
+            elif command[:2] == "st":
                 print "All songs with '" + command[3:] + "' in them:"
-                for i,c in tracks.items():
-                    if command[3:] in c.title.lower():
-                        print i
-            if command[:4] == "help":
-                print "Search through the music library with these commands:"
-                print "st [SEARCH TERM] <- search for track's with [SEARCH TERM] in them"
-                print "sa [SEARCH TERM] <- search for artists with [SEARCH TERM] in them"
-                print "s [SEARCH TERM] <- search for albums with [SEARCH TERM] in them"
-                print "exit <- exit the search function"
+                for i in tracks:
+                    if command[3:] in i.title.lower():
+                        print "  " + i.__str__()
+                print ""
+                continue
+            elif command[:4] == "exit":
+                break
+            elif command[:4] == "help":
+                print help_message
+                continue
+            else:
+                print help_message
         except:
-            print "error in input."
+            print "There was an Error: " + sys.exc_info()[0]
 
 def load_library(dir="."):
     failed = False
     tracks = []
     albums = {}
+    albums2 = []
+    album_title = ""
+    track_title = ""
+    track_year = ""
+    track_genre = ""
+    track_artist = ""
     for root, dirs, files in os.walk(dir):
         
         for filename in files:
@@ -84,14 +120,38 @@ def load_library(dir="."):
                 
                 try:
                     audio = MP3(fullname)
-                    track_to_add = [Track(str(audio['TPE1']),str(audio['TIT2']),str(audio['TALB']))]
+                    try:
+                        album_title = str(audio['TALB'])
+                    except KeyError:
+                        album_title = ""
+                    try:
+                        track_title = str(audio['TIT2'])
+                    except KeyError:
+                        track_title = ""
+                    try:
+                        track_year = str(audio['TDRC'])
+                    except KeyError:
+                        track_year = ""
+                    try:
+                        track_genre = str(audio['TCON'])
+                    except KeyError:
+                        track_genre = ""
+                    try:
+                        track_artist = str(audio['TPE1'])
+                    except KeyError:
+                        track_artist = ""
+                    track_to_add = [Track(track_artist, track_title, album_title)]
                     tracks += track_to_add
-                    if not str(audio['TALB']) in albums:
-                        albums.update({str(audio['TALB']): Album(str(audio['TPE1']),str(audio['TALB']),str(audio['TDRC']), str(audio['TCON']),track_to_add)})
-                    elif str(audio['TALB']) in albums:
-                        albums[str(audio['TALB'])].add_track(track_to_add)
+                    # here we are going to check for when something is empty...
+                    
+                    
+                    if not album_title in albums:
+                        albums.update({album_title: Album(track_artist, album_title, track_year, track_genre,track_to_add)})
+                    elif album_title in albums:
+                        albums[album_title].add_track(track_to_add)
                 except:
                     #print "Error on %s" % fullname
                     pass
-                
-    return [tracks, albums]
+    for i,c in albums.items():
+        albums2 += [c]
+    return [tracks, albums2]

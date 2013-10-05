@@ -1,0 +1,26 @@
+tracks,albums = load_library('mp3s')
+len(tracks)
+len(albums)
+tracks[0]
+print tracks[0]
+print tracks[500]
+print tracks[5000]
+
+print albums[0]
+print albums[1]
+print albums[50]
+print albums[250]
+
+
+music_library(tracks,albums)
+s black
+sa black
+st black
+S orange
+S pink
+search for something nice
+s something nice
+S black coffee
+st black coffee
+st Black cOffee
+exit

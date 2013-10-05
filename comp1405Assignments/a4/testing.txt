@@ -1,0 +1,113 @@
+PS C:\Users\Nicholas\code\projects\comp1405assignments\a4> python -i musiclib.py
+>>> tracks,albums = load_library('mp3s')
+>>> len(tracks)
+5570
+>>> len(albums)
+385
+>>> tracks[0]
+<__main__.Track instance at 0x00000000024745C8>
+>>> print tracks[0]
+Track: Biohazard & Onyx - Judgement Night, by: AAVV
+>>> print tracks[500]
+Track: Machete, by: Moby
+>>> print tracks[5000]
+Track: Yesterday is Here, by: Tom Waits
+>>>
+>>> print albums[0]
+Album: , by:
+>>> print albums[1]
+Album: Tubthumper, by: Chumbawamba
+>>> print albums[50]
+Album: Floored, by: Sugar Ray
+>>> print albums[250]
+Album: The Globe Sessions, by: Sheryl Crow
+>>>
+>>>
+>>> music_library(tracks,albums)
+Enter a command (s, sa, st, help, or exit): s black
+All albums with 'black' in them:
+  Album: The Black Rider, by: Tom Waits
+
+Enter a command (s, sa, st, help, or exit): sa black
+All artists with 'black' in them:
+  Black Seeds
+
+Enter a command (s, sa, st, help, or exit): st black
+All songs with 'black' in them:
+  Track: Black Coffee, by: k.d. lang
+  Track: Black Coffee [vocals by Tricky & Martina Topley Bird], by: Nearly God
+  Track: Black Steel, by: Tricky
+  Track: Black Coffee, by: k.d. lang
+  Track: Black Coffee [vocals by Tricky & Martina Topley Bird], by: Nearly God
+  Track: Black Crowes, The / Lucy In the Sky With Diamonds, by: Various
+  Track: Sarah McLachlan / Blackbird, by: Various
+  Track: Black Uhuru / Youth of Eglington, by: Various
+  Track: Black Tambourine, by: Beck
+  Track: Blackhole, by: Beck
+  Track: Marion Black / Who Knows, by: Various Artists
+  Track: That old black magic / Louis Prima, by: VarMartini MixVarious
+  Track: Black Angel's Death Song, by: Velvet Underground
+  Track: Brigid Cruise; Black Muddy River, by: Wake the Dead
+  Track: Black-Blue-White, by: Wang Chung
+  Track: Horrors of the Black Museum: Overture, by: Westminster Philharmonic Orchestra conducted by Kenneth Alwyn
+  Track: Black and Tan Fantasy, by: Duke Ellington
+  Track: Black And Tan Fantasy, by: Duke Ellington
+  Track: Work Song [from "Black, Brown And Beige"], by: Duke Ellington
+  Track: A B C (Red and Black) (from "Les Miserables"), by: C.C. Productions and The Christopher Emery Company
+  Track: Big Black Mariah, by: Tom Waits
+  Track: Black Wings, by: Tom Waits
+  Track: Black Market Baby, by: Tom Waits
+  Track: Black, by: Sarah McLachlan
+  Track: Black and white, by: Sarah McLachlan
+
+Enter a command (s, sa, st, help, or exit): S orange
+All tracks and albums with 'orange' in them:
+  Track: Orange Ball-Peen Hammer, by: Mudhoney
+  Track: Orange Light, by: Carmine Coppola and Francis Coppola
+
+Enter a command (s, sa, st, help, or exit): S pink
+All tracks and albums with 'pink' in them:
+  Album: Under the Pink, by: Tori Amos
+  Track: Tickled Pink, by: k.d. lang and the Reclines
+  Track: Lady Marmalade - Christina Aguilera, Lil' Kim, Mya & Pink, by: Various
+  Track: Oranj Symphonette / Pink Panther Theme, by: Various Artists
+  Track: Pink Victim, by: Combustible Edison
+  Track: Inside The Pink Building, by: David A. Stewart & Candy Dulfer
+  Track: Pink Noise (Rock Me Amadeus), by: Beck
+  Track: The Pink Building, by: David A. Stewart & Candy Dulfer
+  Track: Pink Jazz Trancers, by: Devo
+
+Enter a command (s, sa, st, help, or exit): search for something nice
+
+Search through the music library with these commands:
+st [SEARCH TERM] <- search for track's with [SEARCH TERM] in them
+sa [SEARCH TERM] <- search for artists with [SEARCH TERM] in them
+s [SEARCH TERM] <- search for albums with [SEARCH TERM] in them
+exit <- exit the search function
+
+Enter a command (s, sa, st, help, or exit): s something nice
+All albums with 'something nice' in them:
+
+Enter a command (s, sa, st, help, or exit): S black coffee
+All tracks and albums with 'black coffee' in them:
+  Track: Black Coffee, by: k.d. lang
+  Track: Black Coffee [vocals by Tricky & Martina Topley Bird], by: Nearly God
+  Track: Black Coffee, by: k.d. lang
+  Track: Black Coffee [vocals by Tricky & Martina Topley Bird], by: Nearly God
+
+Enter a command (s, sa, st, help, or exit): st black coffee
+All songs with 'black coffee' in them:
+  Track: Black Coffee, by: k.d. lang
+  Track: Black Coffee [vocals by Tricky & Martina Topley Bird], by: Nearly God
+  Track: Black Coffee, by: k.d. lang
+  Track: Black Coffee [vocals by Tricky & Martina Topley Bird], by: Nearly God
+
+Enter a command (s, sa, st, help, or exit): st Black cOffee
+All songs with 'black coffee' in them:
+  Track: Black Coffee, by: k.d. lang
+  Track: Black Coffee [vocals by Tricky & Martina Topley Bird], by: Nearly God
+  Track: Black Coffee, by: k.d. lang
+  Track: Black Coffee [vocals by Tricky & Martina Topley Bird], by: Nearly God
+
+Enter a command (s, sa, st, help, or exit): exit
+>>>
