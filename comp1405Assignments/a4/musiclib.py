@@ -1,12 +1,14 @@
 """
 Assignment 4: Music Library
 By Nicholas Hylands
+https://www.github.com/Nyxeka/
 
 NOTE: since it was made explicitly clear in the assignment page that everything should be
 case INSENSITIVE, there will be no "S" function, only an "s" function.
 
 """
 import os
+import sys
 #all of the mutagen files for the bonus question:
 from mutagen.mp3 import MP3
 from mutagen.ogg import OggFileType
@@ -49,13 +51,15 @@ class Album:
     year = ""
     list_of_tracks = []
     genre = ""
-    
-    def __init__(self, artist, title, year='',genre='',tracks=None):
+    #tracks2 because testing error...
+    def __init__(self, artist, title, year='',genre='',tracks2=None):
         self.artist= artist
         self.title = title
         self.year = year
         self.genre = genre
-        self.list_of_tracks += tracks
+        #THIS WAS THE PROBLEM RIGHT HERE:
+        #used to be a +=, now it's an =
+        self.list_of_tracks = tracks2
     
     def add_track(self, track):
         self.list_of_tracks += track
@@ -116,7 +120,7 @@ def music_library(tracks, albums):
             else:
                 print help_message
         except:
-            print "There was an Error: " + sys.exc_info()[0]
+            print "There was an Error: " + str(sys.exc_info()[0])
 
 # some code in the load_library function was taken from the assignment page:
 """
@@ -169,10 +173,15 @@ def load_library(dir="."):
                     audio = MP4(fullname)
                 elif filename.lower().endswith(".asf"):
                     audio = ASF(fullname)
+                else:
+                    continue
                 
                 #now since some of the mp3's given don't have certain ID3 tags...
                 #if they don't, they won't end up in the dictionary, so we will
                 #just set them to be empty
+                #really what I should be doing here is saying:
+                #if 'TALB' in audio:
+                #but whatever.
                 try:
                     album_title = str(audio['TALB'])
                 except KeyError:
@@ -193,18 +202,21 @@ def load_library(dir="."):
                     track_artist = str(audio['TPE1'])
                 except KeyError:
                     track_artist = ""
+                
                 track_to_add = [Track(track_artist, track_title, album_title)]
+                
                 tracks += track_to_add
                 # here we are going to check for when something is empty...
                 
                 #we are using a dictionary for album because it makes it easier to check and 
                 #see if an album already exists.
                 if not album_title in albums:
-                    albums.update({album_title: Album(track_artist, album_title, track_year, track_genre,track_to_add)})
+                    albums[album_title] = Album(track_artist, album_title, track_year, track_genre,track_to_add)
+                    print str(len(albums[album_title].list_of_tracks))
                 elif album_title in albums:
-                    albums[album_title].add_track(track_to_add)
+                    albums[album_title].list_of_tracks += track_to_add
             except:
-                #print "Error on %s" % fullname
+                #print "Error on " + fullname + ": " + str(sys.exc_info()[0])
                 pass
     #since we are done with searching for album names, we can convert albums to a list:
     for i,c in albums.items():
