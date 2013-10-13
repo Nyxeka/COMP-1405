@@ -91,6 +91,7 @@ def only_once(a):
 # Question 4:    
 @print_timing
 def spell_check(wordlist):
+    #find words that aren't actual words in our word-list.
     global words
     bad_words = []
     for a in wordlist:
@@ -103,6 +104,7 @@ def spell_check(wordlist):
 # Question 5:    
 @print_timing
 def anagrams(f):
+    #finds anagrams in words in a file
     f_words = set(get_words(f))
     list_of_anagrams = dict()
     for i in f_words:
@@ -122,8 +124,8 @@ def anagrams(f):
 ##############################################################################
 # Question 6:    
 """
-I think the best way to do this would be to create a list for each of the 
-different types of corrections.
+I think the best way to do this would be to create a set with each of the possible changes
+and compare it to the set of words.
 """
 
 def changes_to_check(word):
