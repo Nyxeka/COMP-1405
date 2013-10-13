@@ -1,0 +1,98 @@
+PS C:\Users\Nicholas\code\projects\comp1405Assignments\a5> python -Q new -i a5.py
+>>>
+>>> #Question 1:
+...
+>>> a = big_list(30)
+>>> ahuge = big_list(1000000)
+>>> len(unique(ahuge))
+---------------
+    function: unique() took 395.999908447 milliseconds
+---------------
+631549
+>>>
+>>> unique(a)
+---------------
+    function: unique() took 0.0 milliseconds
+---------------
+[-4, 3, 0, 8, -5, -13, 11, 4, -11, -14, -8, -2, 13, -3, 1]
+>>>
+>>>
+>>> len(unique(ahuge))
+---------------
+    function: unique() took 394.999980927 milliseconds
+---------------
+631549
+>>>
+>>> #Question 2:
+...
+>>> a
+[-4, 3, 0, 8, 0, -5, -13, 0, -4, -13, 11, 4, 4, -11, 4, 3, -14, -8, -2, 13, -8, -2, 0, -4, -3, -2, 11, 0, 1, -14]
+>>> negated(a)
+---------------
+    function: negated() took 0.0 milliseconds
+---------------
+[0, 3, 4, 8, 11, 13, -13, -11, -8, -4, -3]
+>>>
+>>> len(negated(ahuge))
+---------------
+    function: negated() took 354.000091553 milliseconds
+---------------
+398790
+>>>
+>>>
+>>> #Question 3:
+...
+>>> a
+[-4, 3, 0, 8, 0, -5, -13, 0, -4, -13, 11, 4, 4, -11, 4, 3, -14, -8, -2, 13, -8, -2, 0, -4, -3, -2, 11, 0, 1, -14]
+>>> only_once(a)
+---------------
+    function: only_once() took 0.0 milliseconds
+---------------
+[1, 8, 13, -11, -5, -3]
+>>>
+>>> len(only_once(ahuge))
+---------------
+    function: only_once() took 1150.00009537 milliseconds
+---------------
+366921
+>>>
+>>>
+>>> #Question 4:
+...
+>>> varney = get_words("varney.txt")
+>>> errors = spell_check(varney)
+---------------
+    function: spell_check() took 85.000038147 milliseconds
+---------------
+>>> len(errors)
+8179
+>>>
+>>> errors[1003:1053] #<- I changed this because for some reason I have 3 more and I think it's cause small change in ebook file or something?
+['metalliclooking', 'eyesits', 'halfopened', 'tusklike', 'wasyes', 'wasthe', 'vampyre', 'endeavoured', 'vampyre', '
+vampyre', 'vampyre', 'vaultthe', 'bannerworth', 'marchdale', 'marchdale', 'marchdale', 'bannerworth', 'affianced',
+'marchdale', 'strangelooking', 'thisoh', 'noti', 'marchdale', 'marchdale', 'welcomenone', 'marchdale', 'marchdale',
+ 'bannerworth', 'charlesit', 'meyou', 'ii', 'happieri', 'didfly', 'againit', 'youyou', 'marchdale', 'hushhush', 'ch
+arlesno', 'allthis', 'nono', 'charlesdear', 'nooh', 'horrorhorror', 'iwill', 'wakingwell', 'xi', 'loverthe', 'banne
+rworth', 'recognised', 'bannerworth']
+>>>
+>>>
+>>> #Question 5:
+...
+>>> #it's pretty big...
+... #anagrams("words.txt")
+...
+>>>
+>>> #Question 6:
+...
+>>> suggest_alternatives("aple")
+---------------
+    function: suggest_alternatives() took 0.0 milliseconds
+---------------
+['ale', 'ample', 'apple', 'maple', 'ape', 'axle', 'able', 'apse']
+>>> suggest_alternatives("snak")
+---------------
+    function: suggest_alternatives() took 0.0 milliseconds
+---------------
+['snag', 'snap', 'sneak', 'snack', 'soak']
+>>>
+>>>

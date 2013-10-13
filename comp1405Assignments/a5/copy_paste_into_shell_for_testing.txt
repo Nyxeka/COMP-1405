@@ -1,0 +1,49 @@
+python -Q new -i a5.py
+
+#Question 1:
+
+a = big_list(30)
+ahuge = big_list(1000000)
+len(unique(ahuge))
+
+unique(a)
+
+
+len(unique(ahuge))
+
+#Question 2:
+
+a
+negated(a)
+
+len(negated(ahuge))
+
+
+#Question 3:
+
+a
+only_once(a)
+
+len(only_once(ahuge))
+
+
+#Question 4:
+
+varney = get_words("varney.txt")
+errors = spell_check(varney)
+len(errors)
+
+errors[1003:1053]
+
+
+#Question 5:
+
+#it's pretty big...
+#anagrams("words.txt")
+
+
+#Question 6:
+
+suggest_alternatives("aple")
+suggest_alternatives("snak")
+
