@@ -1,0 +1,72 @@
+"""Some simple skeleton code for a pygame game/animation
+
+This skeleton sets up a basic 800x600 window, an event loop, and a
+redraw timer to redraw at 30 frames per second.
+"""
+from __future__ import division
+import math
+import sys
+import pygame
+
+
+class MyGame(object):
+    def __init__(self):
+        """Initialize a new game"""
+        pygame.mixer.init()
+        pygame.mixer.pre_init(44100, -16, 2, 2048)
+        pygame.init()
+
+        # set up a 640 x 480 window
+        self.width = 800
+        self.height = 600
+        self.screen = pygame.display.set_mode((self.width, self.height))
+
+        # use a black background
+        self.bg_color = 255,255,255
+
+        # Setup a timer to refresh the display FPS times per second
+        self.FPS = 30
+        self.REFRESH = pygame.USEREVENT+1
+        pygame.time.set_timer(self.REFRESH, 1000//self.FPS)
+        
+
+    def run(self):
+        """Loop forever processing events"""
+        running = True
+        
+        #image is 256x256 pixels, made by Nicholas Hylands
+        my_image = pygame.image.load("pygameAssignmentImage.png")
+        image_angle = 0
+        while running:
+            event = pygame.event.wait()
+
+            # player is asking to quit
+            if event.type == pygame.QUIT:
+                running = False
+
+            # time to draw a new frame
+            elif event.type == self.REFRESH:
+                #every 15 frames we want the image to rotate 360 degrees.
+                rotated_image = pygame.transform.rotate(my_image, image_angle)
+                image_angle = (image_angle + 360/15) % 360
+                self.screen.fill([255,255,255])
+                self.screen.blit(rotated_image,(self.width/2-rotated_image.get_width()/2,self.height/2-rotated_image.get_height()/2))
+                pygame.display.flip()
+                #self.draw()
+
+            else:
+                pass # an event type we don't handle            
+
+    def draw(self):
+        """Update the display"""
+        # everything we draw now is to a buffer that is not displayed
+        self.screen.fill(self.bg_color)
+
+        # flip buffers so that everything we have drawn gets displayed
+        pygame.display.flip()
+
+
+MyGame().run()
+pygame.quit()
+sys.exit()
+
