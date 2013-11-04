@@ -48,7 +48,7 @@ class MyGame(object):
                 pass # an event type we don't handle            
 
     def draw(self):
-        """Update the display"""
+        """Update the display - being used to show I know how :D"""
         # everything we draw now is to a buffer that is not displayed
         self.screen.fill(self.bg_color)
         myfont = pygame.font.Font(pygame.font.get_default_font(), 200)

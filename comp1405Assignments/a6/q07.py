@@ -43,7 +43,7 @@ class MyGame(object):
         
         ball_roll_times = self.width - (ball_radius * 3.14159265) - ball_radius*2
         
-        ball_roll_increment = -ball_roll_times/30/2 #number of rolls / thirty drames / two seconds
+        ball_roll_increment = -ball_roll_times/30/2 #number of rolls / thirty frames / two seconds
         
         max_right = self.width - my_image.get_width()
         max_down = self.height - my_image.get_height()
@@ -90,7 +90,7 @@ class MyGame(object):
                 pass # an event type we don't handle            
 
     def draw(self):
-        """Update the display"""
+        """Update the display - UNUSED."""
         # everything we draw now is to a buffer that is not displayed
         self.screen.fill(self.bg_color)
 

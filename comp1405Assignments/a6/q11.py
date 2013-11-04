@@ -88,6 +88,13 @@ class MyGame(object):
         bg_colour = [128,128,128]
         
         debug_info = dict()
+        sound_a = pygame.mixer.Sound("ShotgunFire.wav")#lazy
+        sound_b = pygame.mixer.Sound("nantucket.wav")#lazy
+        
+        at_destination = False
+        
+        # create font for printing stuff:
+        myfont = pygame.font.SysFont("courier", 15)
         
         while running:
             event = pygame.event.wait()
@@ -105,6 +112,8 @@ class MyGame(object):
                 #change location of magnet:
                 #if LMB is pressed
                 if mouse_buttons_pressed[0]:
+                    pygame.mixer.stop()
+                    sound_a.play()
                     magnet_pos_x = mouse_pos[0]
                     magnet_pos_y = mouse_pos[1]
                     
@@ -119,21 +128,28 @@ class MyGame(object):
                     angle_radians = (angle_radians - pi_over_two) % two_pi # we don't want it ending up more than 360 degrees.
                     angle_degrees = angle_radians * rad_to_deg
                 
-                if math.fabs(dist) < close_enough:
-                    accel_rate = 0
-                    tracker_velocity_x = 0
-                    tracker_velocity_y = 0
-                    tracker_pos_x = magnet_pos_x
-                    tracker_pos_y = magnet_pos_y
-                else:
-                    accel_rate = 0.01
-                
+                #the following block of code is lazy. I am lazy sometimes I accept this.
+                if not at_destination:
+                    if math.fabs(dist) < close_enough:
+                        accel_rate = 0
+                        tracker_velocity_x = 0
+                        tracker_velocity_y = 0
+                        tracker_pos_x = magnet_pos_x
+                        tracker_pos_y = magnet_pos_y
+                        pygame.mixer.stop()
+                        sound_b.play()
+                        at_destination = True
+                else: #I'm being really lazy cause I'm really tired so sue me :P
+                    if math.fabs(dist) < close_enough:
+                        accel_rate = 0
+                        tracker_velocity_x = 0
+                        tracker_velocity_y = 0
+                    else:
+                        accel_rate = 0.01
+                        at_destination = False
                 # Now we can do the calculations for the movement of the tracker:
                 tracker_accel_x = accel_rate * math.sin(angle_radians)
                 tracker_accel_y = accel_rate * math.cos(angle_radians)
-                
-                # create font for printing stuff:
-                myfont = pygame.font.SysFont("courier", 15)
                 
                 debug_info["accel_info_x"] = myfont.render("A_x:" + str(tracker_accel_x), 1, [0,255,0])
                 debug_info["accel_info_y"] = myfont.render("A_y:" + str(tracker_accel_y), 1, [0,255,0])
