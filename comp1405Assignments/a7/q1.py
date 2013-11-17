@@ -1,8 +1,3 @@
-"""Some simple skeleton code for a pygame game/animation
-
-This skeleton sets up a basic 800x600 window, an event loop, and a
-redraw timer to redraw at 30 frames per second.
-"""
 from __future__ import division
 import math
 import sys
@@ -16,7 +11,6 @@ class MyGame(object):
         pygame.mixer.pre_init(44100, -16, 2, 2048)
         pygame.init()
 
-        # set up a 640 x 480 window
         self.width = 1024
         self.height = 768
         self.screen = pygame.display.set_mode((self.width, self.height))

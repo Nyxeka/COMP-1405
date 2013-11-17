@@ -103,7 +103,7 @@ class MyGame(object):
         pygame.time.set_timer(self.REFRESH, 1000//self.FPS)
         
         #init sound:
-        self.sound_music = pygame.mixer.Sound("BigBounce.wav")
+        self.sound_music = pygame.mixer.Sound("SpaceAmbiance.ogg")
         self.sound_immortal = pygame.mixer.Sound("smb_warning.wav")
         self.sound_gameover = pygame.mixer.Sound("smb_gameover.wav")
         

@@ -88,6 +88,7 @@ class portal:
         self.connected_rooms = room_list
 
 class room:
+    #room object. has an index of portals
     room_num = None
     
     #portal_index is a NSEW list of the portals' indexes in the room.
@@ -101,7 +102,7 @@ class room:
         self.room_info = []
 
 class level:
-    #collection of rooms.
+    #collection of rooms and portals, basically contains player as well.
     rooms = []
     portals = []
     end_room_index = 0
@@ -160,14 +161,14 @@ class level:
             if cur_room.portal_index[i] is not None:
                 print direction[i]
                 time.sleep(0.5)
-    def change_rooms(self, new_room_index):
+                
+    def change_rooms(self, new_room_index): #move the player to a new room.
         time.sleep(1)
         self.drain_life(self.life_drain)
         self.current_room = new_room_index
         self.room_intro(self.rooms[self.current_room])
-        
-    #dir is short of direction - direction is already a used global variable.
-    def play_challenge(self, floor_number):
+    
+    def play_challenge(self, floor_number): #let the user run the challenge
         #lots to do here...
         #GAMES:
         #which game is layed is decided by the floor_number entered.
@@ -183,7 +184,7 @@ class level:
             self.play_medium_challenge(floor_number)
         elif floor_number >= 14:
             self.play_hard_challenge(floor_number)
-                
+    
     def play_easy_challenge(self, floor_number):
         print """
 This will be a simple two-digit number addition challenge.
@@ -317,6 +318,7 @@ Get 4/5 or 5/5
 #done with class stuff...
 
 def create_level(difficulty):
+    #function to create and initialize our level
     newLev = level(17,difficulty)
     
     #first add the rooms
@@ -373,6 +375,8 @@ def create_level(difficulty):
     
 
 def playGame(newLev):
+    #basically the main function. 
+    #the game happens in this function.
     global debug
     newLev.room_intro(newLev.rooms[newLev.current_room])
     running = True #if we ever want to stop...
@@ -380,8 +384,7 @@ def playGame(newLev):
     #a check we do in the loop. if false, it will skip through the loop and return to
     #asking for the command
     command_entered = False
-    #com short for command
-    com = ""
+    command = ""
     while running:
         command_entered = False
         command_debug = False
@@ -392,23 +395,23 @@ def playGame(newLev):
             lost = True
         
         try:
-            com = raw_input("\nPlease enter a command: ")
-            if com.upper() in command_list:
+            command = raw_input("\nPlease enter a command: ")
+            if command.upper() in command_list:
                 command_entered = True
-            if debug and com[0:4] == "GOTO":
+            if debug and command[0:4] == "GOTO":
                 command_debug = True
                 print "debuggezz"
         except ValueError: #just in case...
             print "ValueError: please type a string >_>"
         #now we want to check the command, and do stuff about it!
         if command_entered == True:
-            com = com.upper()
+            command = command.upper()
             #if it's a directional command:
-            if command_list.index(com) < 4:
+            if command_list.index(command) < 4:
                 
-                if newLev.rooms[newLev.current_room].portal_index[direction.index(com.lower())] is not None:
+                if newLev.rooms[newLev.current_room].portal_index[direction.index(command.lower())] is not None:
                     
-                    new_portal_index = newLev.rooms[newLev.current_room].portal_index[direction.index(com.lower())]
+                    new_portal_index = newLev.rooms[newLev.current_room].portal_index[direction.index(command.lower())]
                     newRoom = (newLev.portals[new_portal_index].connected_rooms.index(newLev.current_room)+1) % len(newLev.portals[new_portal_index].connected_rooms)
                     #check to see if barrier requires a challenge:
                     if newLev.portals[new_portal_index].barrier_type == 1:
@@ -431,17 +434,17 @@ def playGame(newLev):
                     newLev.change_rooms(newLev.portals[new_portal_index].connected_rooms[newRoom])
                 else:
                     print "\nYou may not go in that direction.\n"
-            if com == "HELP":
+            if command == "HELP":
                 print help_message
-            if com == "MAP":
+            if command == "MAP":
                 print map
-            if com == "EXIT":
+            if command == "EXIT":
                 print "Exit called, quitting."
                 break
         if command_debug:
-            if com[0:4] == "GOTO":
+            if command[0:4] == "GOTO":
                 print "changing rooms..."
-                newLev.change_rooms(int(com[5:]))
+                newLev.change_rooms(int(command[5:]))
     if lost:
         os.system(cls)
         print game_over_message
