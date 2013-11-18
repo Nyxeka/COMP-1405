@@ -42,7 +42,6 @@ class Animation():
     
     def get_current_frame(self):
         return self.image.subsurface(pygame.Rect(self.frame_locations[self.current_frame].x,self.frame_locations[self.current_frame].y,self.anim_width,self.anim_height))
-        #Surface.subsurface(Rect): return Surface
     
     def nextFrame(self):
         self.current_frame += 1
@@ -57,12 +56,23 @@ class Entity():
         self.location = Vector(x,y)
         self.velocity = Vector(vel_x,vel_y)
         self.animation = dict()
+        self.animation_state = ""
+        self.direction = "right"
     
     def add_animation(self, name, animation):
         self.animation[name] = animation
     
-    def loop_animation(self,animation):
-        
+    def loop_animation(self,increment):
+        self.animation[self.animation_state].anim_timer += increment
+        if self.animation[self.animation_state].anim_timer > self.animation[self.animation_state].anim_framerate:
+            self.animation[self.animation_state].anim_timer = 0.0
+            self.animation[self.animation_state].nextFrame()
+            
+    def current_image(self):
+        if self.direction == "right":
+            return self.animation[self.animation_state].get_current_frame()
+        else:
+            return pygame.transform.flip(self.animation[self.animation_state].get_current_frame(),True,False)
 
         
 class State():
@@ -305,12 +315,17 @@ class My_Game(object):
         self.update_mouse_location()
         keys = pygame.key.get_pressed()
         if keys[pygame.K_RIGHT]:
-            self.player.animation["running"].anim_timer += self.game_counter_increment
-            if self.player.animation["running"].anim_timer > self.player.animation["running"].anim_framerate:
-                self.player.animation["running"].anim_timer = 0.0
-                self.player.animation["running"].nextFrame()
+            self.player.direction = "right"
+            self.player.animation_state = "running"
+        elif keys[pygame.K_LEFT]:
+            self.player.direction = "left"
+            self.player.animation_state = "running"
+        else:
+            self.player.animation_state = "running"
         
-        self.screen.blit(self.player.animation["running"].get_current_frame(), ((self.player.location.x,self.player.location.y)))
+        self.player.loop_animation(self.game_counter_increment)
+        
+        self.screen.blit(self.player.current_image(), ((self.player.location.x,self.player.location.y)))
         
     def exit_state_run_game(self):
         """function to call when changing FROM run_game state"""
