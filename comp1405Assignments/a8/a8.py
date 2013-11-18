@@ -136,7 +136,7 @@ class Button():
         self.image = self.font.render(self.text, 1, colour)
         
 class Platform():
-    def __init__(self,x,y,width,height,speed = 1,colour = (0,128,0)):
+    def __init__(self,x,y,width,height,speed = 1,colour = (0,0,75)):
         self.x = x
         self.y = y
         self.width = width
@@ -223,7 +223,7 @@ class My_Game(object):
         self.debug_log = False
         #---
         #background colour:
-        self.bg_color = 128,128,128
+        self.bg_color = 25,25,25
         #font for debug info stuff
         self.myfont_info = pygame.font.SysFont("courier", 15)
         #---
@@ -238,6 +238,11 @@ class My_Game(object):
         self.old_button_down = False
         self.button_down = False
         self.game_over_counter = 0.0
+        #---
+        self.sound_music = pygame.mixer.Sound("SpaceAmbiance.ogg")
+        self.channel_1 = self.sound_music.play(-1)
+        self.channel_1.pause()
+        self.sound_game_over = pygame.mixer.Sound("smb_gameover.wav")
         #=============================================
         
     def game_event_add_score(self):
@@ -290,8 +295,11 @@ class My_Game(object):
     
     def state_game_over(self):
         self.screen.fill([0,0,0])
+        
         self.score = 0.0
         game_over_texts = dict()
+        if self.game_over_counter == 0:
+            self.sound_game_over.play()
         self.game_over_counter += self.game_counter_increment
         if self.game_over_counter >= 3.0:
             self.game_over_counter = 0.0
@@ -347,6 +355,7 @@ class My_Game(object):
         """function to call when entering the run_game state
            basically all we're gonna do here is unthaw the VM
            which means we are going to make sure everything is "unpaused" """
+        self.channel_1.unpause()
         pass
     
     def enter_state_first_time_run_game(self):
@@ -354,7 +363,7 @@ class My_Game(object):
         
         #first, initiate entities.
         #Entity(self, name, x=0, y=0, vel_x=0,vel_y=0):
-        self.player_sprite_sheet = pygame.image.load("i8aic.png")
+        self.player_sprite_sheet = pygame.image.load("qb7e6.png")
         self.player_sprite_sheet.set_colorkey((0,128,128))
         self.player = Entity("Player",200,200)
         self.player.add_animation("running",Animation(self.player_sprite_sheet,52,65,0.04,-1))
@@ -414,7 +423,7 @@ class My_Game(object):
         if keys[pygame.K_ESCAPE]:
             self.change_state("main_menu")
         
-        self.score_info = self.myfont_info.render("Score: " + str(self.score), 1, (0,0,0))
+        self.score_info = self.myfont_info.render("Score: " + str(self.score), 1, (255,255,255))
         
         if self.score < 0:
             self.change_state("game_over")
@@ -509,14 +518,14 @@ class My_Game(object):
         for i in self.platform:
             if i in self.platform:
                 pygame.draw.rect(self.screen, self.platform[i].colour,self.platform[i].get_rect())
-                pygame.draw.rect(self.screen, (0,0,0),self.platform[i].get_rect_next_width(),1)
+                pygame.draw.rect(self.screen, (0,75,120),self.platform[i].get_rect_next_width(),1)
                 if not self.platform[i].next_width == self.platform[i].width:
                     pygame.draw.rect(self.screen, (255,0,0),pygame.Rect(self.platform[i].x+self.platform[i].next_width,self.platform[i].y,self.platform[i].width-self.platform[i].next_width,self.platform[i].height),1)
                 
         
     def exit_state_run_game(self):
         """function to call when changing FROM run_game state"""
-        pass
+        self.channel_1.pause()
         
     def run(self):
         """Loop forever processing events"""
