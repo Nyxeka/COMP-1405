@@ -26,8 +26,29 @@ class Vector():
         return math.atan((-self.y)/self.x) #-self.y because pygame's y axis is messed...
         
 class Animation():
-    def __init__():
-        pass
+    def __init__(self, image, anim_width, anim_height, framerate = 0.1):
+        self.image = image
+        self.anim_width = anim_width
+        self.anim_height = anim_height
+        self.num_frames = 0
+        self.frame_locations = dict()
+        self.current_frame = 1
+        self.anim_timer = 0
+        self.anim_framerate = framerate
+        
+    def add_frame_location(self,frame_number,x,y):
+        self.frame_locations[frame_number] = Vector(x,y)
+        self.num_frames += 1
+    
+    def get_current_frame(self):
+        return self.image.subsurface(pygame.Rect(self.frame_locations[self.current_frame].x,self.frame_locations[self.current_frame].y,self.anim_width,self.anim_height))
+        #Surface.subsurface(Rect): return Surface
+    
+    def nextFrame(self):
+        self.current_frame += 1
+        if self.current_frame > self.num_frames:
+            self.current_frame = 1
+    
     
 class Entity():
     def __init__(self, name, x=0, y=0, vel_x=0,vel_y=0):
@@ -35,6 +56,14 @@ class Entity():
         #set intial location and velocity
         self.location = Vector(x,y)
         self.velocity = Vector(vel_x,vel_y)
+        self.animation = dict()
+    
+    def add_animation(self, name, animation):
+        self.animation[name] = animation
+    
+    def loop_animation(self,animation):
+        
+
         
 class State():
     def __init__(self, state_function, enter_state_function = Pass, exit_state_function = Pass, enter_state_first_time = Pass):
@@ -154,7 +183,7 @@ class My_Game(object):
         #font for debug info stuff
         self.myfont_info = pygame.font.SysFont("courier", 15)
         #---
-        self.game_counters_increment = 1/self.FPS
+        self.game_counter_increment = 1/self.FPS
         #---
         self.current_state = "main_menu"
         self.pause = False
@@ -247,8 +276,25 @@ class My_Game(object):
     
     def enter_state_first_time_run_game(self):
         """function to call when running run_game for the first time..."""
-        pass
-    
+        
+        #first, initiate entities.
+        #Entity(self, name, x=0, y=0, vel_x=0,vel_y=0):
+        self.player_sprite_sheet = pygame.image.load("i8aic.png")
+        self.player_sprite_sheet.set_colorkey((0,128,128))
+        self.player = Entity("Player",200,200)
+        self.player.add_animation("running",Animation(self.player_sprite_sheet,52,65,0.06))
+        #_____________________________________________________
+        #start adding where the frames are on the sprite sheet
+        self.player.animation["running"].add_frame_location(1,7,106)
+        self.player.animation["running"].add_frame_location(2,80,106)
+        self.player.animation["running"].add_frame_location(3,150,106)
+        self.player.animation["running"].add_frame_location(4,217,106)
+        self.player.animation["running"].add_frame_location(5,286,106)
+        self.player.animation["running"].add_frame_location(6,346,106)
+        #=====================================================
+        
+        
+        
     def state_run_game(self):
         
         #so, each of the entities will be targetting the appropriate 'thing'
@@ -258,7 +304,14 @@ class My_Game(object):
         #update keys and mouse
         self.update_mouse_location()
         keys = pygame.key.get_pressed()
-    
+        if keys[pygame.K_RIGHT]:
+            self.player.animation["running"].anim_timer += self.game_counter_increment
+            if self.player.animation["running"].anim_timer > self.player.animation["running"].anim_framerate:
+                self.player.animation["running"].anim_timer = 0.0
+                self.player.animation["running"].nextFrame()
+        
+        self.screen.blit(self.player.animation["running"].get_current_frame(), ((self.player.location.x,self.player.location.y)))
+        
     def exit_state_run_game(self):
         """function to call when changing FROM run_game state"""
         pass
