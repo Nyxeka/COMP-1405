@@ -111,7 +111,7 @@ def make_change(n,b=dict()):
     
 
 def canadian_change(n):
-    rounded_cents = int(5 * round(float(x)/5))
+    rounded_cents = int(5 * round(float(n)/5))
     print "$%.2f is rounded to $%.2f" % (float(n)/100, float(rounded_cents)/100)
     amounts = [100,50,20,10,5,2,1,0.25,0.1,0.05]
     change = make_change(rounded_cents)
@@ -119,3 +119,27 @@ def canadian_change(n):
         for i in amounts:
             if c[i] > 0:
                 print str(c[i]) + " x $" + str(i)
+                
+#Question 8:
+def triple_sum(a, x):
+    result = []
+    b = set(a)
+    done = False
+    for i in range(len(a)-1):
+        for j in range(i+1, len(a)):
+            number = x-(a[i]+a[j])
+            
+            if number in b:
+                result.append(i)
+                
+                result.append(j)
+                
+                result.append(a.index(number))
+                
+                done = True
+                break
+        if done:
+            break
+    return result
+    
+    
